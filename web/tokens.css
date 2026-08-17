@@ -1,0 +1,83 @@
+/* 设计令牌。后面所有样式只引用变量，不写死颜色。
+
+   材质规则只有一条：毛玻璃是「外壳」的材质，不是「内容」的材质。
+   侧栏和浮层用它，内容区一律实色。满屏半透明会让界面显得廉价，
+   高级感来自排版、留白与层级，不是来自材质特效。 */
+
+:root {
+  /* ---- 底色 ----
+     暖纸，不是白也不是灰。三阶只差一点点，用来分层不用来装饰。 */
+  --paper:      #EAE8E0;
+  --paper-2:    #EFEDE6;
+  --surface:    #FAF8F3;
+  --surface-2:  #F5F2EB;
+
+  --ink:        #17150E;
+  --ink-2:      #3D3A31;
+  --ink-mute:   #767267;
+  --ink-faint:  #A5A195;
+
+  /* 发丝描边。比阴影更能表达「这是一张纸的边」 */
+  --hair:       rgba(23, 21, 14, .09);
+  --hair-soft:  rgba(23, 21, 14, .055);
+
+  /* ---- 森林系 ----
+     苔绿承担所有主要动作，柠檬绿全站只出现在状态点与选中指示条上。 */
+  --moss:   #43613C;
+  --kombu:  #2A4A2E;
+  --arti:   #7A9169;
+  --lime:   #AFC244;
+  --cedar:  #7E4A2C;
+  --amber:  #9A6C08;
+  --teal:   #35635F;
+  --rust:   #A15C3E;
+
+  --ok:      var(--moss);
+  --warn:    var(--amber);
+  --bad:     var(--rust);
+  --ok-bg:   rgba(67, 97, 60, .10);
+  --warn-bg: rgba(154, 108, 8, .11);
+  --bad-bg:  rgba(161, 92, 62, .11);
+
+  /* ---- 毛玻璃，只给外壳用 ---- */
+  --shell-glass: linear-gradient(180deg, rgba(250, 248, 243, .74), rgba(240, 237, 230, .58));
+  --shell-blur:  blur(24px) saturate(150%);
+  --float-glass: linear-gradient(170deg, rgba(252, 251, 247, .93), rgba(243, 240, 233, .88));
+
+  /* ---- 阴影，两层封顶 ---- */
+  --lift-1: 0 1px 2px rgba(23, 21, 14, .04);
+  --lift-2: 0 1px 2px rgba(23, 21, 14, .04), 0 10px 28px -18px rgba(23, 21, 14, .28);
+  --lift-3: 0 2px 4px rgba(23, 21, 14, .05), 0 24px 52px -26px rgba(23, 21, 14, .42);
+
+  /* ---- 字体 ----
+     字号跨度拉开，比加任何特效都显高级。 */
+  --sans: "Be Vietnam Pro", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          "PingFang HK", "PingFang TC", "Noto Sans HK", "Microsoft JhengHei",
+          "Hiragino Sans", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", "Cascadia Mono",
+          "Roboto Mono", Menlo, Consolas, monospace;
+
+  --fs-display: 34px;
+  --fs-h3:      18px;
+  --fs-body:    15px;
+  --fs-sm:      13.5px;
+  --fs-label:   10.5px;
+
+  --ls-display: -.032em;
+  --ls-h3:      -.018em;
+  --ls-label:   .2em;
+
+  /* ---- 形状 ---- */
+  --r-pill: 999px;
+  --r-sm:   9px;
+  --r:      14px;
+  --r-lg:   18px;
+
+  /* ---- 缓动，全站只用这三条 ---- */
+  --spring: cubic-bezier(.34, 1.42, .64, 1);   /* 交互反馈 */
+  --glide:  cubic-bezier(.32, .72, 0, 1);      /* 位置移动 */
+  --fade:   cubic-bezier(.4, 0, .2, 1);        /* 淡入淡出 */
+
+  --rail-w: 236px;
+  --gutter: 44px;
+}
