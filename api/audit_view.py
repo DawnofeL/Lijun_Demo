@@ -18,8 +18,14 @@ def read_audit(
     limit: int = 200,
     user: deps.User = Depends(deps.require("supervisor", "admin")),
 ) -> dict:
-    rows = db.query("SELECT * FROM audit_log ORDER BY created_at DESC, id DESC LIMIT ?",
-                    (min(limit, 500),))
+    # 組長只看本院舍。這裡漏掉範圍限制的話，正好是在「證明權限隔離」
+    # 的那一頁上把隔離漏掉，切帳號演示時第一個被抓到的就是它。
+    where, args = deps.audit_scope(user)
+    rows = db.query(
+        "SELECT * FROM audit_log WHERE 1 = 1" + where +
+        " ORDER BY created_at DESC, id DESC LIMIT ?",
+        args + [min(limit, 500)],
+    )
     for row in rows:
         raw = row.pop("details_json", None)
         row["details"] = json.loads(raw) if raw else []

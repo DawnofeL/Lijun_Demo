@@ -112,10 +112,16 @@ const UI = (() => {
      它做三件事：等舊視圖的離場動畫播完（資料請求是在動畫期間並行發出的，
      所以通常等不到什麼）、換上新內容、再讓頂層區塊依序浮起。
      token 用來擋住快速連點造成的競態：晚到的舊請求不會蓋掉新視圖。 */
-  async function mount(main, nodes) {
-    const token = main.dataset.token;
+  async function mount(main, nodes, token) {
+    /* token 是「這一輪渲染」的編號，由 render() 產生、視圖原樣傳進來。
+
+       必須由呼叫端傳入，不能在這裡讀 main.dataset.token：讀的時候拿到的
+       永遠是「當前最新」那個號，跟自己比一定相等，於是過期的視圖會若無其事
+       地把新視圖蓋掉。症狀是登入後立刻點側欄，落在新頁上的卻是今日工作台。
+       非同步的續行必須自己記得屬於哪一輪，這件事只能靠傳參。 */
+    const mine = token !== undefined ? token : main.dataset.token;
     if (main.__flyDone) await main.__flyDone;
-    if (main.dataset.token !== token) return false;
+    if (main.dataset.token !== mine) return false;
     main.replaceChildren(...[].concat(nodes).filter(Boolean));
     Motion.enterMain(main);
     Motion.enter(main);

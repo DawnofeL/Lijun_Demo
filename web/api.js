@@ -53,8 +53,62 @@ const Api = (() => {
     return response;
   }
 
+  /* 探针：给「權限自檢」用。
+
+     和 request() 的差别只有一个，但很关键：request() 遇到非 2xx 会 throw，
+     而且把状态码揉进了字串（「請求失敗（403）」），拿不到结构化的 status。
+     自检页要把 403 当「资料」而不是「错误」——那正是它要展示的东西。
+
+     它也刻意不触发全域的 401 跳转：自检页本来就在打会被拒的介面，
+     一旦顺手把人踢回登入页，整页就白跑了。真的 401（token 过期）
+     会照实回传，由呼叫端自己决定怎么办。
+
+     回传 { ok, status, detail, count, ms }，永远不抛错（连线失败回 status 0）。 */
+  async function probe(method, path, options = {}) {
+    const headers = {};
+    const active = token.get();
+    if (active) headers.Authorization = "Bearer " + active;
+    if (options.json !== undefined) headers["Content-Type"] = "application/json";
+
+    const started = performance.now();
+    let response;
+    try {
+      response = await fetch("/api" + path, {
+        method,
+        headers,
+        body: options.json !== undefined ? JSON.stringify(options.json)
+            : options.body !== undefined ? options.body : undefined,
+      });
+    } catch (_) {
+      return { ok: false, status: 0, detail: "無法連線到服務", count: null,
+               ms: Math.round(performance.now() - started) };
+    }
+    const ms = Math.round(performance.now() - started);
+
+    let body = null;
+    try { body = await response.json(); } catch (_) { /* 不是 JSON，当没有 */ }
+
+    // 计数从回传体里挖：多数介面是 { items: [...] }，少数直接给 total
+    let count = null;
+    if (body && typeof body === "object") {
+      if (Array.isArray(body)) count = body.length;
+      else if (Array.isArray(body.items)) count = body.items.length;
+      else if (typeof body.total === "number") count = body.total;
+    }
+
+    return {
+      ok: response.ok,
+      status: response.status,
+      detail: (body && body.detail) || null,
+      body,
+      count,
+      ms,
+    };
+  }
+
   return {
     token,
+    probe,
     setUnauthorizedHandler: (fn) => { onUnauthorized = fn; },
     get: (path) => request(path),
     post: (path, json) => request(path, { json }),

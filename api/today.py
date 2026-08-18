@@ -18,7 +18,7 @@ router = APIRouter(tags=["today"])
 def today(user: deps.User = Depends(deps.current_user)) -> dict:
     day = date.today().isoformat()
     where, args = deps.scope_filter(user, "s")
-    fac_where, fac_args = deps.facility_scope(user, "r")
+    fac_where, fac_args = deps.resident_scope(user, "r")
 
     # 今日節次，按時間排。這是時間線的主體。
     sessions = db.query(
@@ -82,9 +82,14 @@ def today(user: deps.User = Depends(deps.current_user)) -> dict:
         if rules.target_status(row["completed"], row["weekly_target"])["level"] == "behind":
             behind += 1
 
+    # 最近動態同樣要限院舍。組長看得到別間院舍的動態，
+    # 等於留痕這一層漏了一個口子，而且是在首頁漏的。
+    audit_where, audit_args = deps.audit_scope(user)
     recent = db.query(
         "SELECT actor_name, actor_role, summary, created_at FROM audit_log"
-        " ORDER BY created_at DESC, id DESC LIMIT 4"
+        " WHERE 1 = 1" + audit_where +
+        " ORDER BY created_at DESC, id DESC LIMIT 4",
+        audit_args,
     ) if user.role in ("supervisor", "admin") else []
 
     return {

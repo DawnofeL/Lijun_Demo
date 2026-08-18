@@ -13,9 +13,13 @@ def weekly_targets(
     week: str = "auto",
     user: deps.User = Depends(deps.current_user),
 ) -> dict:
-    """资助目标达成率。week 可为 auto / current / last。"""
+    """资助目标达成率。week 可为 auto / current / last。
+
+    范围走 resident_scope：达成率是问责，职员该看到的是自己负责的住客，
+    不是整间院舍的未达标名单。
+    """
     period = rules.pick_week(week)
-    where, args = deps.facility_scope(user, "r")
+    where, args = deps.resident_scope(user, "r")
 
     rows = db.query(
         "SELECT r.id, r.bed_no, r.name, r.funding_type, r.service_track, r.weekly_target,"
@@ -47,8 +51,8 @@ def weekly_targets(
 
 @router.get("/compliance/assessments")
 def assessment_due(user: deps.User = Depends(deps.current_user)) -> dict:
-    """180 天评估周期追踪。逾期与从未评估排最前。"""
-    where, args = deps.facility_scope(user, "r")
+    """180 天评估周期追踪。逾期与从未评估排最前。范围同上。"""
+    where, args = deps.resident_scope(user, "r")
     rows = db.query(
         "SELECT r.id, r.bed_no, r.name, r.funding_type, r.last_assessed,"
         " f.name AS facility_name"

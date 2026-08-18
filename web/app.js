@@ -14,7 +14,8 @@ const NAV = [
   ]},
   { group: "合規", items: [
     { hash: "compliance", label: "合規看板" },
-    { hash: "audit",      label: "操作留痕", roles: ["supervisor", "admin"] },
+    { hash: "audit",      label: "操作留痕", roles: ["supervisor", "admin"], probe: "audit" },
+    { hash: "access",     label: "權限自檢" },
   ]},
   { group: "智能", items: [
     { hash: "assistant",  label: "智能助理" },
@@ -31,7 +32,7 @@ const DEMO_ACCOUNTS = [
   ["admin", "管理員 · 吳偉明", "看得到三間院舍"],
 ];
 
-const state = { user: null, banner: "示範資料，非真實住客" };
+const state = { user: null, banner: "示範資料，非真實住客", autoProbe: null };
 
 /* ------------------------------------------------------------------ 登入 */
 
@@ -95,7 +96,7 @@ let shell = null;
 
 function renderShell(activeHash) {
   if (shell && shell.owner === state.user.id) {
-    shell.root.querySelectorAll(".nav-item").forEach((a) => {
+    shell.root.querySelectorAll(".nav-item:not(.locked)").forEach((a) => {
       a.classList.toggle("active", a.getAttribute("href") === "#" + activeHash);
     });
     placeMarker(true);
@@ -105,15 +106,32 @@ function renderShell(activeHash) {
 }
 
 function buildShell(activeHash) {
+  /* 沒權限的項目不再從側欄拿掉，改成顯示但掛一把鎖。
+     拿掉的話三種角色的側欄長度不同，但觀眾不會去數選單項，
+     等於這個差異白做了。掛鎖則是把「這裡有東西、你打不開」直接畫出來，
+     而且點下去會真的收到一個 403——消極證據變成積極證據。
+
+     鎖住的項不參與選中態比對（見 renderShell 的 :not(.locked)），
+     否則停在權限自檢頁時它會跟著一起亮。 */
   const groups = NAV.map((group) => {
-    const items = group.items.filter((item) => !item.roles || item.roles.includes(state.user.role));
-    if (!items.length) return null;
+    if (!group.items.length) return null;
     return el("div", { class: "nav-group" }, [
       el("span", { text: group.group }),
-    ].concat(items.map((item) => el("a", {
-      class: "nav-item" + (item.hash === activeHash ? " active" : ""),
-      href: "#" + item.hash,
-    }, [el("i", { class: "dot" }), item.label]))));
+    ].concat(group.items.map((item) => {
+      const locked = item.roles && !item.roles.includes(state.user.role);
+      if (locked) {
+        return el("a", {
+          class: "nav-item locked",
+          href: "#access",
+          title: "此功能不在你的權限範圍內，點擊當場向後端驗證一次",
+          onclick: () => { state.autoProbe = item.probe || null; },
+        }, [el("i", { class: "dot" }), item.label, lockIcon()]);
+      }
+      return el("a", {
+        class: "nav-item" + (item.hash === activeHash ? " active" : ""),
+        href: "#" + item.hash,
+      }, [el("i", { class: "dot" }), item.label]);
+    })));
   }).filter(Boolean);
 
   const sidebar = el("aside", { class: "rail" }, [
@@ -131,12 +149,59 @@ function buildShell(activeHash) {
   ]);
 
   const main = el("main", { class: "main" });
-  const root = el("div", { class: "shell" }, [sidebar, main, identityMenu()]);
+  // 視野條在 main 之外。放進去的話每次換視圖 replaceChildren 就把它沖掉了，
+  // 而它必須一直在——權限要渗透在每一頁，不能只活在一個專門頁面裡。
+  const meter = el("div", { class: "scope-meter" });
+  const content = el("div", { class: "content" }, [meter, main]);
+  const root = el("div", { class: "shell" }, [sidebar, content, identityMenu()]);
   document.getElementById("root").replaceChildren(root);
-  shell = { root, main, owner: state.user.id };
+  shell = { root, main, meter, owner: state.user.id };
+  paintScopeMeter(meter);
   markerTop = null;                                  // 換了一棵樹，舊位置作廢
   requestAnimationFrame(() => placeMarker(false));   // 首次不動畫
   return main;
+}
+
+/* 視野條。常駐在內容區頂部，每一頁都在。
+
+   這是整套權限展示裡投入產出比最高的一件事：它把「看不到」量化了。
+   側欄少一項是消極證據，觀眾不會去數選單；「另有 80 位不在你的範圍內」
+   是積極證據，一個數字就說完了，而且切換身分時它會當場變長。
+
+   分母只是聚合計數，不含任何住客身份。真正被擋住的內容一筆都沒出來。 */
+async function paintScopeMeter(meter) {
+  let info;
+  try {
+    info = await Api.get("/scope");
+  } catch (_) {
+    meter.replaceChildren();      // 取不到就整條不顯示，不擺一條空殼在那裡
+    return;
+  }
+  if (!shell || shell.meter !== meter) return;   // 期間換過帳號，這條已作廢
+
+  const rate = info.residents_total
+    ? Math.round(info.responsible / info.residents_total * 100) : 100;
+
+  const tail = [];
+  if (info.hidden_residents) tail.push(`另有 ${info.hidden_residents} 位住客`);
+  if (info.hidden_facilities) tail.push(`${info.hidden_facilities} 間院舍`);
+
+  meter.replaceChildren(
+    el("div", { class: "sm-label", text: "你的範圍" }),
+    el("div", { class: "sm-bar" }, [el("i", { style: "width:" + rate + "%" })]),
+    el("div", { class: "sm-nums" }, [
+      el("b", { text: `負責 ${info.responsible}` }),
+      el("span", { text: `/ ${info.residents_total} 位住客` }),
+      el("span", { class: "sep", text: "·" }),
+      el("b", { text: `${info.facilities}` }),
+      el("span", { text: `/ ${info.facilities_total} 間院舍` }),
+    ]),
+    el("div", { class: "sm-tail", text: tail.length
+      ? tail.join("、") + "不在你的範圍內"
+      : "你看得到系統裡的全部資料" }),
+  );
+  meter.classList.add("on");
+  Motion.growBar(meter.querySelector(".sm-bar > i"), rate);
 }
 
 /* 把滑動指示器擺到目前選中項的位置。
@@ -152,7 +217,7 @@ function placeMarker(animate = true) {
   const nav = document.querySelector(".nav");
   if (!nav) return;
   const marker = nav.querySelector(".nav-marker");
-  const active = nav.querySelector(".nav-item.active");
+  const active = nav.querySelector(".nav-item.active:not(.locked)");
   if (!marker) return;
   if (!active) { marker.classList.remove("on"); markerTop = null; return; }
 
@@ -237,7 +302,7 @@ function signOut(message) {
 
 /* ------------------------------------------------------------------ 今日工作台 */
 
-async function viewToday(main) {
+async function viewToday(main, token) {
   const data = await Api.get("/today");
   const a = data.attention;
 
@@ -323,12 +388,12 @@ async function viewToday(main) {
           ]))),
         ])
       : null,
-  ]);
+  ], token);
 }
 
 /* ------------------------------------------------------------------ 工作計劃 */
 
-async function viewSessions(main) {
+async function viewSessions(main, token) {
   const bounds = await Api.get("/sessions/dates");
   const picker = el("input", { type: "date", value: bounds.today,
     min: bounds.first_date || "", max: bounds.last_date || "" });
@@ -371,13 +436,13 @@ async function viewSessions(main) {
       ]),
       el("div", { id: "session-body" }),
     ]),
-  ]);
+  ], token);
   await load();
 }
 
 /* ------------------------------------------------------------------ 住客主檔 */
 
-async function viewResidents(main) {
+async function viewResidents(main, token) {
   const canImport = ["supervisor", "admin"].includes(state.user.role);
   const fileInput = el("input", { type: "file", accept: ".xlsx,.xlsm", style: "display:none" });
   const resultBox = el("div");
@@ -472,13 +537,13 @@ async function viewResidents(main) {
       resultBox,
       el("div", { id: "resident-body" }),
     ]),
-  ]);
+  ], token);
   await load();
 }
 
 /* ------------------------------------------------------------------ 合規看板 */
 
-async function viewCompliance(main) {
+async function viewCompliance(main, token) {
   const [targets, assessments, gaps] = await Promise.all([
     Api.get("/compliance/targets"),
     Api.get("/compliance/assessments"),
@@ -513,7 +578,7 @@ async function viewCompliance(main) {
 
   await UI.mount(main, [
     UI.pageHead("COMPLIANCE", "合規看板",
-      "資助目標達成率與 180 天評估周期。判斷邏輯是純函數，可單獨測試。"),
+      "這一頁回答一件事：社署明天來查，我們哪裡會被抓。"),
 
     UI.section("資助目標達成率", targets.week.label, [
       targets.week.auto_switched ? UI.notice("info", targets.week.reason) : null,
@@ -541,12 +606,12 @@ async function viewCompliance(main) {
       UI.notice("warn", "紙本轉系統時最常見的缺口。節次已完成，服務表單卻沒有對應紀錄，稽查時無法舉證。"),
       UI.table(gapCols, gaps.items.slice(0, 15), "沒有缺口"),
     ]),
-  ]);
+  ], token);
 }
 
 /* ------------------------------------------------------------------ 操作留痕 */
 
-async function viewAudit(main) {
+async function viewAudit(main, token) {
   const head = () => UI.pageHead("AUDIT TRAIL", "操作留痕",
     "紙本紀錄有個隱性優點，塗改的痕跡擦不掉。系統若不留痕，在監管與投訴面前反而比紙更弱。");
 
@@ -606,12 +671,12 @@ async function viewAudit(main) {
       UI.notice("info", data.note),
       el("div", { class: "log" }, data.items.map(row)),
     ]),
-  ]);
+  ], token);
 }
 
 /* ------------------------------------------------------------------ 智能助理 */
 
-async function viewAssistant(main) {
+async function viewAssistant(main, token) {
   const head = () => UI.pageHead("ASSISTANT", "智能助理",
     "回答流程與系統問題。規範條文請到「規範問答」查，那裡每句都標註原文出處。");
 
@@ -696,12 +761,12 @@ async function viewAssistant(main) {
       el("div", { class: "dim", style: "font-size:12px;margin-top:12px",
         text: "助理不提供任何臨床判斷或醫療建議。對話僅保存在本次瀏覽階段，重整即清空。" }),
     ]),
-  ]);
+  ], token);
 }
 
 /* ------------------------------------------------------------------ 規範問答 */
 
-async function viewKnowledge(main) {
+async function viewKnowledge(main, token) {
   const status = await Api.get("/knowledge/status");
 
   const input = el("input", { type: "text", placeholder: "例如：住客跌倒之後的處理流程是什麼" });
@@ -785,12 +850,12 @@ async function viewKnowledge(main) {
                       + "本原型為自研，介面、資訊架構與資料模型均獨立設計。" }),
       ]),
     ]),
-  ]);
+  ], token);
 }
 
 /* ------------------------------------------------------------------ 待辦與風險 */
 
-async function viewRoadmap(main) {
+async function viewRoadmap(main, token) {
   const data = await Api.get("/roadmap");
 
   const tone = (status) =>
@@ -814,7 +879,242 @@ async function viewRoadmap(main) {
       UI.notice("info", data.note),
       ...items,
     ]),
+  ], token);
+}
+
+/* ------------------------------------------------------------------ 權限自檢 */
+
+/* 這一頁沒有任何專用後端。每個按鈕打的都是其他頁面在打的同一批介面，
+   結果是伺服器當場回的。沒有可作弊的地方，所以沒法作弊——
+   如果為這頁單寫一個 /api/demo/check，它回什麼都是我說了算，證明力歸零。
+
+   三個「管理類」探針都打空目標，任何角色都不會動到一行資料：
+   職員在 Depends(require(...)) 就被擋下，根本進不到 handler；
+   組長與管理員進得去，但刪除指向不存在的 id、匯入送的是無效檔案，
+   所以 200 變成 404 與 400。這是這頁在演示現場不會翻車的保證。 */
+
+const BAD_IMPORT = () => {
+  const form = new FormData();
+  form.append("file", new Blob(["這不是 Excel"], { type: "text/plain" }), "無效檔案.txt");
+  return form;
+};
+
+const PROBES = [
+  { key: "sessions", group: "讀取", label: "查看工作計劃",
+    method: "GET", path: "/sessions", allowStatus: [200],
+    say: (r) => `回傳 ${r.count} 筆節次` },
+
+  { key: "residents", group: "讀取", label: "查看住客主檔",
+    method: "GET", path: "/residents", allowStatus: [200],
+    say: (r) => `回傳 ${r.count} 位住客` },
+
+  { key: "facilities", group: "讀取", label: "可見院舍範圍",
+    method: "GET", path: "/residents", allowStatus: [200],
+    say: (r) => {
+      const names = new Set(((r.body || {}).items || []).map((i) => i.facility_name));
+      return `${names.size} 間院舍 · ${[...names].join("、") || "無"}`;
+    } },
+
+  { key: "targets", group: "讀取", label: "查看合規看板",
+    method: "GET", path: "/compliance/targets", allowStatus: [200],
+    say: (r) => `回傳 ${r.count} 位住客的達成率` },
+
+  { key: "roadmap", group: "讀取", label: "查看待辦與風險",
+    method: "GET", path: "/roadmap", allowStatus: [200],
+    say: (r) => `回傳 ${r.count} 條` },
+
+  { key: "audit", group: "管理", label: "查詢操作留痕", roles: ["supervisor", "admin"],
+    method: "GET", path: "/audit", allowStatus: [200],
+    say: (r) => `回傳 ${r.count} 筆留痕` },
+
+  { key: "import", group: "管理", label: "匯入住客名單", roles: ["supervisor", "admin"],
+    method: "POST", path: "/residents/import", allowStatus: [400],
+    body: BAD_IMPORT,
+    say: () => "介面可達。本次刻意送了無效檔案，未寫入任何資料" },
+
+  { key: "remove", group: "管理", label: "移除住客", roles: ["supervisor", "admin"],
+    method: "DELETE", path: "/residents/999999", allowStatus: [404],
+    say: () => "介面可達。本次指向不存在的住客，未刪除任何資料" },
+];
+
+const LOCK_SVG =
+  '<svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true">' +
+  '<path d="M3.7 5.3V3.95a2.3 2.3 0 0 1 4.6 0V5.3" fill="none" stroke="currentColor"' +
+  ' stroke-width="1.15" stroke-linecap="round"/>' +
+  '<rect x="2.5" y="5.3" width="7" height="5" rx="1.15" fill="currentColor"/></svg>';
+
+const lockIcon = () => el("i", { class: "lock", html: LOCK_SVG });
+
+async function viewAccess(main, token) {
+  const user = state.user;
+  const allowedFor = (probe) => !probe.roles || probe.roles.includes(user.role);
+
+  const results = new Map();
+  const rowOf = new Map();
+  const buttonOf = new Map();
+
+  /* ---- 匯總。頁面的標題必須是「全部符合預期」這個好消息，
+         紅色出現在裡面當證據。少了這一句，看到三行紅字的第一反應
+         會是「你這系統有問題」，那就完全反了。 ---- */
+  const summary = el("div", { class: "probe-summary" });
+
+  function paintSummary() {
+    const all = [...results.values()];
+    if (!all.length) {
+      summary.className = "probe-summary";
+      summary.replaceChildren(el("span", { class: "idle", text: "尚未執行任何檢查" }));
+      return;
+    }
+    const pass = all.filter((r) => r.expected).length;
+    const blocked = all.filter((r) => r.status === 403).length;
+    const allPass = pass === all.length;
+    summary.className = "probe-summary on" + (allPass ? "" : " warn");
+    summary.replaceChildren(
+      el("strong", { text: `${all.length} 項檢查` }),
+      el("em", { text: `${pass} 項符合預期` }),
+      blocked ? el("span", { text: `其中 ${blocked} 項被正確攔截` }) : null,
+    );
+  }
+
+  /* ---- 單行結果。兩層：上層業務語言給老闆看，
+         下層是等寬的回執，折疊起來，被問「這是真的嗎」時當場展開。 ---- */
+  function paintRow(probe) {
+    const row = rowOf.get(probe.key);
+    const record = results.get(probe.key);
+    const allow = allowedFor(probe);
+
+    if (!record) {
+      row.className = "probe-row idle";
+      row.replaceChildren(
+        el("div", { class: "pr-main" }, [
+          el("div", { class: "pr-label" }, [probe.label, allow ? null : lockIcon()]),
+          el("div", { class: "pr-say", text: "尚未執行" }),
+        ]),
+        el("div", { class: "pr-verdict" }, [el("span", { class: "pr-wait", text: "—" })]),
+      );
+      return;
+    }
+
+    const denied = record.status === 403;
+    row.className = "probe-row " + (denied ? "denied" : "granted") + " in";
+    row.replaceChildren(
+      el("div", { class: "pr-main" }, [
+        el("div", { class: "pr-label" }, [probe.label, allow ? null : lockIcon()]),
+        el("div", { class: "pr-say", text: record.line }),
+        el("details", { class: "probe-raw" }, [
+          el("summary", { text: "後端回應" }),
+          el("div", { class: "raw-line" }, [
+            el("span", { class: "m", text: probe.method }),
+            el("span", { class: "p", text: "/api" + probe.path }),
+            el("span", { class: "s " + (denied ? "no" : "ok"), text: String(record.status) }),
+            el("span", { class: "t", text: record.ms + "ms" }),
+          ]),
+          record.detail
+            ? el("div", { class: "raw-detail", text: `後端原話：「${record.detail}」` })
+            : null,
+        ]),
+      ]),
+      el("div", { class: "pr-verdict" }, [
+        el("span", { class: "pr-stamp " + (denied ? "no" : "ok"),
+                     text: denied ? "✕ 拒絕" : "✓ 允許" }),
+        el("span", { class: "pr-expect " + (record.expected ? "ok" : "bad"),
+                     text: record.expected ? "符合預期" : "不符預期" }),
+      ]),
+    );
+  }
+
+  async function runProbe(probe) {
+    const button = buttonOf.get(probe.key);
+    if (button) { button.disabled = true; button.classList.add("running"); }
+
+    const options = probe.body ? { body: probe.body() } : {};
+    const result = await Api.probe(probe.method, probe.path, options);
+
+    const allow = allowedFor(probe);
+    const expected = allow ? probe.allowStatus.includes(result.status)
+                           : result.status === 403;
+    const line = result.status === 403
+      ? (result.detail || "此功能不在你的權限範圍內")
+      : (expected ? probe.say(result)
+                  : `非預期回應（${result.status}）${result.detail ? "：" + result.detail : ""}`);
+
+    results.set(probe.key, { ...result, allow, expected, line });
+    paintRow(probe);
+    paintSummary();
+
+    if (button) { button.disabled = false; button.classList.remove("running"); }
+    return results.get(probe.key);
+  }
+
+  /* ---- 版面 ---- */
+  const rows = el("div", { class: "probe-list" },
+    PROBES.map((probe) => {
+      const row = el("div", { class: "probe-row idle" });
+      rowOf.set(probe.key, row);
+      return row;
+    }));
+  PROBES.forEach(paintRow);
+  paintSummary();
+
+  function buttonGroup(name) {
+    return el("div", { class: "probe-group" }, [
+      el("span", { class: "pg-label", text: name === "讀取" ? "讀取類" : "管理類" }),
+      el("div", { class: "pg-row" }, PROBES.filter((p) => p.group === name).map((probe) => {
+        const allow = allowedFor(probe);
+        const button = el("button", {
+          class: "probe-btn" + (allow ? "" : " locked"),
+          onclick: () => runProbe(probe),
+        }, [probe.label, allow ? null : lockIcon()]);
+        buttonOf.set(probe.key, button);
+        return button;
+      })),
+    ]);
+  }
+
+  const runAll = el("button", { class: "btn primary", text: "全部執行" });
+  runAll.addEventListener("click", async () => {
+    runAll.disabled = true;
+    const label = runAll.textContent;
+    results.clear();
+    PROBES.forEach(paintRow);
+    paintSummary();
+    for (const probe of PROBES) {
+      runAll.textContent = "執行中 " + (PROBES.indexOf(probe) + 1) + " / " + PROBES.length;
+      const record = await runProbe(probe);
+      // 被攔下的那一筆多停一拍，讓它單獨落地，眼睛才會跟過去
+      await Motion.wait(record.status === 403 ? 260 : 110);
+    }
+    runAll.textContent = label;
+    runAll.disabled = false;
+  });
+
+  const identity = el("div", { class: "probe-who" }, [
+    el("div", { class: "pw-line" }, [
+      el("span", { class: "pw-name", text: user.display_name }),
+      el("span", { class: "pw-role", text: user.role_label }),
+      el("span", { class: "pw-meta",
+        text: user.position + (user.facility_name ? " · " + user.facility_name : "") }),
+    ]),
+    el("div", { class: "pw-scope", text: user.scope_label }),
   ]);
+
+  await UI.mount(main, [
+    UI.pageHead("ACCESS CONTROL", "權限自檢",
+      "這一頁不讀任何特製資料。每個按鈕都會真的向後端發一次請求，" +
+      "結果是伺服器當場回的，不是畫上去的。"),
+    UI.section("目前身分", null, [identity]),
+    UI.section("逐項檢查", "管理類的三項都指向空目標，任何角色執行都不會動到資料。", [
+      el("div", { class: "probe-actions" }, [buttonGroup("讀取"), buttonGroup("管理"), runAll]),
+    ]),
+    UI.section("結果", null, [summary, rows]),
+  ], token);
+
+  // 從側欄那把鎖點進來時，自動把那一項跑掉，省一次點擊
+  if (state.autoProbe) {
+    const probe = PROBES.find((p) => p.key === state.autoProbe);
+    state.autoProbe = null;
+    if (probe) { await Motion.wait(420); await runProbe(probe); }
+  }
 }
 
 /* ------------------------------------------------------------------ 路由 */
@@ -826,6 +1126,7 @@ const VIEWS = {
   residents: viewResidents,
   compliance: viewCompliance,
   audit: viewAudit,
+  access: viewAccess,
   knowledge: viewKnowledge,
   roadmap: viewRoadmap,
 };
@@ -843,8 +1144,10 @@ async function render() {
   const main = renderShell(hash);
   currentHash = hash;
 
-  // 每次渲染換一個 token，用來擋住快速連點造成的競態
-  main.dataset.token = String(++renderToken);
+  // 每次渲染換一個 token，用來擋住快速連點造成的競態。
+  // 這個號要一路傳進視圖再傳進 UI.mount，過期的那一輪才擋得住。
+  const token = String(++renderToken);
+  main.dataset.token = token;
 
   // 舊視圖各元素分別滑走。這裡「不 await」是關鍵：
   // 視圖的資料請求在動畫期間就發出去，兩件事並行。
@@ -852,7 +1155,7 @@ async function render() {
   main.__flyDone = switching ? Motion.leaveMain(main) : Promise.resolve();
 
   try {
-    await VIEWS[hash](main);
+    await VIEWS[hash](main, token);
   } catch (error) {
     // 出錯也要有完整的頁面：標題、說明、回去的路。
     // 只丟一條錯誤訊息的話，使用者連自己在哪一頁都看不出來。
@@ -868,7 +1171,7 @@ async function render() {
         el("button", { class: "btn ghost", text: "回到今日工作台",
           onclick: () => { location.hash = "#today"; } }),
       ]),
-    ]);
+    ], token);
   }
 }
 

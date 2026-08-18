@@ -99,8 +99,46 @@ def scope_filter(user: User, table_alias: str = "") -> tuple[str, list]:
 
 
 def facility_scope(user: User, table_alias: str = "") -> tuple[str, list]:
-    """只按院舍限制，不限到个人。住客主档、合规看板用这个。"""
+    """只按院舍限制，不限到个人。住客主档用这个。
+
+    住客主档是院舍级共享的：同一间院舍的治疗师本来就要查得到彼此的住客，
+    不然交更和补位就没法做。合规看板不同，见 resident_scope。
+    """
     prefix = f"{table_alias}." if table_alias else ""
     if user.role == "admin":
         return "", []
     return f" AND {prefix}facility_id = ?", [user.facility_id]
+
+
+def resident_scope(user: User, table_alias: str = "r") -> tuple[str, list]:
+    """住客范围，职员限定到「本人负责的住客」。合规看板与今日工作台用这个。
+
+    住客表上没有负责人栏位，负责关系是由工作节次建立的：
+    谁被指派了这位住客的节次，谁就负责这位住客。所以这里走子查询，
+    而不是在 residents 上加一个会跟排班脱节的冗余栏位。
+
+    这一条和 facility_scope 的分工是刻意的，也是踩过的坑：
+    合规看板问的是「谁没做到」，那是问责，问责必须落到人；
+    住客主档问的是「这位住客是谁」，那是查档，查档限到人反而挡住正常协作。
+    同一个 facility_scope 套在两种问题上，就会出现职员看到整间院舍的
+    未达标名单——那既不是他的责任范围，也让权限演示当场失去说服力。
+    """
+    prefix = f"{table_alias}." if table_alias else ""
+    if user.role == "staff":
+        return (f" AND {prefix}id IN (SELECT resident_id FROM work_sessions"
+                f" WHERE staff_id = ? AND is_deleted = 0)", [user.id])
+    if user.role == "supervisor":
+        return f" AND {prefix}facility_id = ?", [user.facility_id]
+    return "", []
+
+
+def audit_scope(user: User, table_alias: str = "") -> tuple[str, list]:
+    """留痕范围。组长只看本院舍，管理员看全部。
+
+    facility_id 为空的是系统层级动作，不属于任何一间院舍，一律可见。
+    """
+    prefix = f"{table_alias}." if table_alias else ""
+    if user.role == "admin":
+        return "", []
+    return (f" AND ({prefix}facility_id = ? OR {prefix}facility_id IS NULL)",
+            [user.facility_id])

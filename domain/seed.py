@@ -105,9 +105,36 @@ def _make_residents(facility_id: str, count: int, start_index: int) -> list[tupl
     return rows
 
 
+def _assign_caseloads(residents: list[dict], staff_by_facility: dict) -> dict:
+    """把每间院舍的住客切成互不重叠的负责名单，一位治疗师一份。
+
+    真实院舍里治疗师带的是固定的一批住客，不是每天从全院随机抽人。
+    随机抽的话，三个月下来每位治疗师都会碰过全院每一位住客，
+    「本人负责的住客」这个范围就等于「整间院舍」，权限分层名存实亡。
+
+    留 20% 的重叠：名单尾部的住客会同时挂在下一位治疗师名下，
+    模拟真实的补位与跨组协作。完全不重叠反而不像真的。
+    """
+    caseloads: dict[int, list[int]] = {}
+    for facility_id, staff_list in staff_by_facility.items():
+        pool = sorted([r for r in residents if r["facility_id"] == facility_id],
+                      key=lambda r: r["id"])
+        if not pool or not staff_list:
+            continue
+        size = len(pool) / len(staff_list)
+        overlap = max(1, round(size * 0.2))
+        for index, member in enumerate(staff_list):
+            start = round(index * size)
+            end = round((index + 1) * size) + overlap      # 尾部与下一位重叠
+            share = pool[start:end] or pool[start:start + 1]
+            caseloads[member["id"]] = share
+    return caseloads
+
+
 def _make_sessions(residents: list[dict], staff_by_facility: dict, days_back: int = 90):
     rows = []
     today = date.today()
+    caseloads = _assign_caseloads(residents, staff_by_facility)
     for offset in range(days_back, -1, -1):
         day = today - timedelta(days=offset)
         if day.weekday() >= 5:            # 周末不排
@@ -118,7 +145,9 @@ def _make_sessions(residents: list[dict], staff_by_facility: dict, days_back: in
                 continue
             for member in staff_list:
                 slot = 8 * 60 + 30        # 08:30 起
-                picks = random.sample(pool, min(len(pool), random.randint(6, 10)))
+                # 只从自己名下的住客里排，不再全院随机抽
+                own = caseloads.get(member["id"]) or pool
+                picks = random.sample(own, min(len(own), random.randint(6, 10)))
                 for resident in picks:
                     length = random.choice([15, 20, 30])
                     start = f"{slot // 60:02d}:{slot % 60:02d}"
