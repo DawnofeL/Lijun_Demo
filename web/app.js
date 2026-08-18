@@ -134,28 +134,56 @@ function buildShell(activeHash) {
   const root = el("div", { class: "shell" }, [sidebar, main, identityMenu()]);
   document.getElementById("root").replaceChildren(root);
   shell = { root, main, owner: state.user.id };
+  markerTop = null;                                  // 換了一棵樹，舊位置作廢
   requestAnimationFrame(() => placeMarker(false));   // 首次不動畫
   return main;
 }
 
 /* 把滑動指示器擺到目前選中項的位置。
-   animate 為 false 時關掉過渡，用於首次渲染。 */
+   animate 為 false 時關掉過渡，用於首次渲染。
+
+   位置走 translate、擠壓走 scale。這兩個是各自獨立的 CSS 屬性，
+   不是同一條 transform，所以擠壓可以先回彈、位移還在走，互不打斷。
+   合成一條 transform 的話，中途改擠壓會把位移的過渡一併重啟。 */
+let markerTop = null;
+let markerSettle = null;
+
 function placeMarker(animate = true) {
   const nav = document.querySelector(".nav");
   if (!nav) return;
   const marker = nav.querySelector(".nav-marker");
   const active = nav.querySelector(".nav-item.active");
   if (!marker) return;
-  if (!active) { marker.classList.remove("on"); return; }
+  if (!active) { marker.classList.remove("on"); markerTop = null; return; }
 
   // offsetTop 是相對 .nav（它是 position: relative 的），不必逐層累加
-  const skip = !animate || Motion.reduced();
+  const top = active.offsetTop;
+  const skip = !animate || Motion.reduced() || markerTop === null;
+
   if (skip) marker.style.transition = "none";
   marker.style.height = active.offsetHeight + "px";
-  marker.style.transform = "translateY(" + active.offsetTop + "px)";
+  marker.style.translate = "0 " + top + "px";
   marker.classList.add("on");
-  if (skip) requestAnimationFrame(() => { marker.style.transition = ""; });
+
+  if (skip) {
+    marker.style.scale = "1 1";
+    requestAnimationFrame(() => { marker.style.transition = ""; });
+  } else {
+    // 走得越遠拉得越長，封頂 16%。再多就變成在抽搐，不是在流動。
+    // 原點放在行進方向的前緣，被拉長的才是尾巴而不是頭。
+    const travel = top - markerTop;
+    const stretch = 1 + Math.min(Math.abs(travel) / 620, .16);
+    marker.style.transformOrigin = travel > 0 ? "50% 100%" : "50% 0";
+    marker.style.scale = "1 " + stretch;
+    clearTimeout(markerSettle);
+    markerSettle = setTimeout(() => { marker.style.scale = "1 1"; }, 150);
+  }
+  markerTop = top;
 }
+
+// 換行、換斷點都會讓選中項位移。這種位移不是使用者觸發的，
+// 補位要瞬時完成，不能讓指示器自己飄過去。
+window.addEventListener("resize", () => placeMarker(false));
 
 /* 右上角常驻的身份入口。演示时要频繁切换三个角色，这个必须显眼。 */
 function identityMenu() {
