@@ -41,9 +41,9 @@ TOKEN_TTL_HOURS = 12
 # 任何 OpenAI 相容端点都可以：DeepSeek / DashScope / OpenAI / 本地 vLLM
 # 预设指向 DeepSeek，换服务只要改 .env 里的三个值，程式码一行不动。
 LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://api.deepseek.com/v1")
-# 金钥只从环境变数或 .env 读，绝不写死在这里。
-# .env 在 .gitignore 里，硬编进来就等于推上 git，之后换金钥也救不回已推的那一版。
-LLM_API_KEY = os.getenv("LLM_API_KEY", "")
+# 预设金钥直接写在这里，clone 下来就能用，不必再建 .env。
+# 环境变数或 .env 里的 LLM_API_KEY 仍然优先，换金钥不用改程式码。
+LLM_API_KEY = os.getenv("LLM_API_KEY", "sk-0c3bd586cfb946f4b9ef7f8585286fcf")
 LLM_MODEL = os.getenv("LLM_MODEL", "deepseek-chat")
 
 # 打开后知识库问答不发请求，直接走预置答案。现场没有网络时用。
