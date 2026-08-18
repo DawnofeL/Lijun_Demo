@@ -23,11 +23,11 @@ VALID_GENDER = {"男", "女"}
 
 @router.get("/residents")
 def list_residents(user: deps.User = Depends(deps.current_user)) -> dict:
-    where, args = deps.facility_scope(user)
+    where, args = deps.facility_scope(user, "r")
     rows = db.query(
         "SELECT r.*, f.name AS facility_name FROM residents r"
         " JOIN facilities f ON f.id = r.facility_id"
-        " WHERE r.is_deleted = 0" + where.replace("AND ", "AND r.", 1) +
+        " WHERE r.is_deleted = 0" + where +
         " ORDER BY r.facility_id, r.bed_no",
         args,
     )

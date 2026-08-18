@@ -6,7 +6,7 @@ details 是逐栏变更，前端折叠起来，需要时才展开。
 
 import json
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 
 from core import db, deps
 
@@ -15,7 +15,10 @@ router = APIRouter(tags=["audit"])
 
 @router.get("/audit")
 def read_audit(
-    limit: int = 200,
+    # 上下界都要卡。原本寫 min(limit, 500)，負數會漏過去，
+    # 而 SQLite 的 LIMIT -1 意思是「不限制」——?limit=-1 就能把整張表拖出來。
+    # 現在只有一百多筆看不出問題，留痕表長到百萬級時這是一發即中的。
+    limit: int = Query(200, ge=1, le=500),
     user: deps.User = Depends(deps.require("supervisor", "admin")),
 ) -> dict:
     # 組長只看本院舍。這裡漏掉範圍限制的話，正好是在「證明權限隔離」
@@ -24,7 +27,7 @@ def read_audit(
     rows = db.query(
         "SELECT * FROM audit_log WHERE 1 = 1" + where +
         " ORDER BY created_at DESC, id DESC LIMIT ?",
-        args + [min(limit, 500)],
+        args + [limit],
     )
     for row in rows:
         raw = row.pop("details_json", None)

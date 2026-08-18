@@ -1101,6 +1101,7 @@ tbody tr.removing {
 }
 .sm-nums b { font-size: 15px; font-weight: 750; color: var(--ink); }
 .sm-nums .sep { color: var(--ink-faint); margin: 0 3px; }
+.sm-alt { color: var(--ink-faint); }
 
 /* 這一句才是重點：被擋掉的量。字級不大，但它是整條的結論。 */
 .sm-tail {

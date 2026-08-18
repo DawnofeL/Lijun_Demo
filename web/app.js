@@ -124,7 +124,12 @@ function buildShell(activeHash) {
           class: "nav-item locked",
           href: "#access",
           title: "此功能不在你的權限範圍內，點擊當場向後端驗證一次",
-          onclick: () => { state.autoProbe = item.probe || null; },
+          onclick: () => {
+            state.autoProbe = item.probe || null;
+            // 已經停在自檢頁時 hash 不會變，也就不會重繪，那一下看起來像沒反應。
+            // 演示現場老闆連點兩次是常態，第二下沒反應比什麼都尷尬。
+            if (location.hash === "#access") render();
+          },
         }, [el("i", { class: "dot" }), item.label, lockIcon()]);
       }
       return el("a", {
@@ -192,6 +197,11 @@ async function paintScopeMeter(meter) {
     el("div", { class: "sm-nums" }, [
       el("b", { text: `負責 ${info.responsible}` }),
       el("span", { text: `/ ${info.residents_total} 位住客` }),
+      // 「可查閱」跟「負責」不一樣，而且畫面上兩個數字都看得到：
+      // 住客主檔列的是可查閱的 30 位，合規看板算的是負責的 12 位。
+      // 不把這個差別寫在條上，被問到時就變成解釋不清的破綻。
+      info.readable !== info.responsible
+        ? el("span", { class: "sm-alt", text: `（可查閱 ${info.readable}）` }) : null,
       el("span", { class: "sep", text: "·" }),
       el("b", { text: `${info.facilities}` }),
       el("span", { text: `/ ${info.facilities_total} 間院舍` }),
@@ -295,6 +305,7 @@ function identityMenu() {
 function signOut(message) {
   Api.token.clear();
   state.user = null;
+  state.autoProbe = null;      // 不清的話，換個帳號進自檢頁會莫名自己跑一項
   shell = null;
   history.replaceState(null, "", location.pathname);
   renderLogin(message || "已登出。");
@@ -1079,6 +1090,8 @@ async function viewAccess(main, token) {
     PROBES.forEach(paintRow);
     paintSummary();
     for (const probe of PROBES) {
+      // 使用者中途切走就別再打了。畫面已經不在，請求還在飛沒有意義。
+      if (main.dataset.token !== token) break;
       runAll.textContent = "執行中 " + (PROBES.indexOf(probe) + 1) + " / " + PROBES.length;
       const record = await runProbe(probe);
       // 被攔下的那一筆多停一拍，讓它單獨落地，眼睛才會跟過去

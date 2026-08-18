@@ -62,9 +62,9 @@ def scope(user: deps.User = Depends(deps.current_user)) -> dict:
     readable = db.query_one(
         "SELECT COUNT(*) AS n FROM residents r WHERE r.is_deleted = 0" + read_where,
         read_args)["n"]
-    facilities = db.query_one(
-        "SELECT COUNT(DISTINCT r.facility_id) AS n FROM residents r"
-        " WHERE r.is_deleted = 0" + read_where, read_args)["n"]
+    # 院舍數直接由角色決定，不去數「住客落在幾間院舍」。
+    # 數住客的話，一間剛開還沒有住客的院舍會讓管理員顯示 2 / 3。
+    facilities = total_facilities if user.role == "admin" else 1
 
     return {
         "role": user.role,

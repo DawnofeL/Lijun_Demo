@@ -125,8 +125,12 @@ def resident_scope(user: User, table_alias: str = "r") -> tuple[str, list]:
     """
     prefix = f"{table_alias}." if table_alias else ""
     if user.role == "staff":
-        return (f" AND {prefix}id IN (SELECT resident_id FROM work_sessions"
-                f" WHERE staff_id = ? AND is_deleted = 0)", [user.id])
+        # 子查詢裡的欄位一律寫全名。不寫的話 SQLite 會先在內層找，
+        # 找得到就用內層——現在是對的，但外層哪天多一個同名欄位就會靜默錯掉，
+        # 而且錯的方向是「多看到人」，這種錯不會有人來報。
+        return (f" AND {prefix}id IN (SELECT work_sessions.resident_id"
+                f" FROM work_sessions WHERE work_sessions.staff_id = ?"
+                f" AND work_sessions.is_deleted = 0)", [user.id])
     if user.role == "supervisor":
         return f" AND {prefix}facility_id = ?", [user.facility_id]
     return "", []
