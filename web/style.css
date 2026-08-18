@@ -66,29 +66,71 @@ body {
 }
 
 /* 导航：选中态的背景由一枚独立的指示器负责，item 自己只管文字颜色。
-   指示器在 app.js 里量测新旧位置后滑过去。 */
+   指示器在 app.js 里量测新旧位置后滑过去。
+
+   这一枚是液态玻璃。玻璃有三件事必须同时成立，少一件就变成半透明色块：
+   身后的东西被折射（backdrop-filter 的 blur 与 brightness），
+   自身有厚度（上亮下沉的渐层），边缘会挂光（顶缘一条高光加一圈发丝边）。
+   「液态」来自位移时的挤压回弹，那一下在 app.js 的 placeMarker 里做。 */
 .nav { position: relative; }
 .nav-group { position: static; }
 
 .nav-marker {
   position: absolute; left: 0; right: 0; top: 0; height: 0;
-  border-radius: var(--r-sm);
-  background: rgba(23, 21, 14, .055);
-  box-shadow: inset 0 0 0 1px var(--hair-soft);
+  border-radius: var(--r-pill);
   pointer-events: none; opacity: 0;
-  transition: transform .42s var(--glide), height .42s var(--glide), opacity .2s var(--fade);
+
+  /* 一、折射。提亮是关键：玻璃之所以看得见，是因为它比周围亮一点点。 */
+  backdrop-filter: blur(13px) saturate(190%) brightness(1.10);
+  -webkit-backdrop-filter: blur(13px) saturate(190%) brightness(1.10);
+
+  /* 二、厚度。斜向渐层，上缘接近白、下缘偏苔绿，玻璃才有上下之分。 */
+  background: linear-gradient(168deg,
+              rgba(255, 255, 255, .56) 0%,
+              rgba(255, 255, 255, .28) 46%,
+              rgba(232, 238, 223, .34) 100%);
+
+  /* 三、挂光与浮起。前三条 inset 分别是顶缘高光、底缘回弹光、一圈发丝边；
+     后两条是投影，让它浮在侧栏之上而不是嵌在里面。 */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .95),
+    inset 0 -1px 0 rgba(255, 255, 255, .42),
+    inset 0 0 0 1px rgba(255, 255, 255, .34),
+    0 1px 1px rgba(23, 21, 14, .04),
+    0 6px 16px -8px rgba(23, 21, 14, .22);
+
+  transform-origin: 50% 100%;
+  /* 位移走 translate、挤压走 scale，两个是各自独立的 CSS 属性，
+     所以挤压可以先回弹、位移还在走，互不打断。 */
+  transition: translate .46s var(--glide), height .46s var(--glide),
+              scale .34s var(--spring), opacity .22s var(--fade);
 }
 .nav-marker.on { opacity: 1; }
-.nav-marker::before {
-  content: ""; position: absolute; left: 0; top: 26%; bottom: 26%;
-  width: 2px; border-radius: 2px; background: var(--lime);
+
+/* 边缘色散。玻璃边上折射出的那点颜色，用 mask 挖空中间只留一圈环。
+   左上是柠檬绿、右下是苔绿，两处都压到很淡，是暗示不是描边。 */
+.nav-marker::after {
+  content: ""; position: absolute; inset: 0;
+  border-radius: inherit; padding: 1px;
+  background: linear-gradient(150deg,
+              rgba(175, 194, 68, .60) 0%, rgba(255, 255, 255, 0) 38%,
+              rgba(255, 255, 255, 0) 62%, rgba(67, 97, 60, .32) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask-composite: exclude;
+}
+
+/* 不支援 backdrop-filter 时退到实色，不留一块糊掉的透明版。 */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .nav-marker { background: rgba(255, 255, 255, .82); }
 }
 
 .nav-item {
   position: relative; z-index: 1;
   display: flex; align-items: center; gap: 10px;
   padding: 9px 13px; margin-bottom: 1px;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-pill);
   color: var(--ink-2); text-decoration: none;
   font-size: 14px; font-weight: 500;
   transition: color .2s var(--fade), background .2s var(--fade);
@@ -98,9 +140,13 @@ body {
   background: currentColor; opacity: .32;
   transition: all .3s var(--spring);
 }
-.nav-item:hover { color: var(--ink); background: rgba(23, 21, 14, .03); }
+.nav-item:hover { color: var(--ink); background: rgba(255, 255, 255, .42); }
 .nav-item.active { color: var(--kombu); font-weight: 650; background: transparent; }
-.nav-item.active .dot { background: var(--lime); opacity: 1; transform: scale(1.4); }
+/* 选中的那一点是全站唯一的柠檬绿光源，外面那圈晕就是它打在玻璃上的光。 */
+.nav-item.active .dot {
+  background: var(--lime); opacity: 1; transform: scale(1.4);
+  box-shadow: 0 0 0 3px rgba(175, 194, 68, .22), 0 0 8px rgba(175, 194, 68, .55);
+}
 
 .rail-foot { margin-top: auto; padding: 16px 6px 0; }
 
@@ -562,7 +608,16 @@ table.log-detail td:first-child { color: var(--ink-mute); width: 28%; }
   .nav-group { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
   .nav-group > span { width: 100%; }
   .nav-marker { display: none; }
-  .nav-item.active { background: rgba(23, 21, 14, .055); }
+  /* 窄屏导航横排，指示器没有可滑的轨道，选中态直接画在 item 上，
+     材质与宽屏那枚保持一致，只是不会动。 */
+  .nav-item.active {
+    background: linear-gradient(168deg, rgba(255, 255, 255, .58), rgba(232, 238, 223, .36));
+    backdrop-filter: blur(13px) saturate(190%) brightness(1.10);
+    -webkit-backdrop-filter: blur(13px) saturate(190%) brightness(1.10);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95),
+                inset 0 0 0 1px rgba(255, 255, 255, .34),
+                0 4px 12px -8px rgba(23, 21, 14, .22);
+  }
   .identity { position: static; margin: 0 0 14px; }
   .id-panel { position: static; opacity: 1; visibility: visible; transform: none; display: none; width: 100%; }
   .identity.open .id-panel { display: block; }
