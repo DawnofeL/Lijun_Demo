@@ -1,0 +1,646 @@
+<title>能跑与能扛</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap">
+
+<style>
+/* 沿用 SEDNA CARE 的设计令牌。暖纸三阶、森林绿、柠檬绿只表达「你的」、
+   赤陶只表达「代价」。三条缓动曲线，不多不少。 */
+:root{
+  --paper:#EAE8E0; --paper-2:#EFEDE6; --surface:#FAF8F3; --surface-2:#F5F2EB;
+  --ink:#17150E; --ink-2:#3D3A31; --ink-mute:#767267; --ink-faint:#A5A195;
+  --hair:rgba(23,21,14,.09); --hair-soft:rgba(23,21,14,.055);
+  --moss:#43613C; --kombu:#2A4A2E; --arti:#7A9169; --lime:#AFC244;
+  --rust:#A15C3E; --amber:#9A6C08;
+  --sans:"Be Vietnam Pro",-apple-system,BlinkMacSystemFont,"PingFang SC","PingFang HK","Noto Sans SC","Microsoft YaHei",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --spring:cubic-bezier(.34,1.42,.64,1);
+  --glide:cubic-bezier(.32,.72,0,1);
+  --fade:cubic-bezier(.4,0,.2,1);
+  --pad:clamp(28px,5vw,86px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:var(--sans); font-size:16px; line-height:1.62;
+  -webkit-font-smoothing:antialiased; overflow:hidden;
+}
+
+/* 背景：一层极淡的径向柔光加一层颗粒，跟产品同一套 */
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+.bg::before{
+  content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(1100px 620px at 18% -14%,rgba(122,145,105,.20),transparent 66%),
+    radial-gradient(900px 520px at 96% 108%,rgba(175,194,68,.12),transparent 62%),
+    linear-gradient(176deg,var(--paper-2) 0%,var(--paper) 58%,#E6E4DB 100%);
+}
+.grain{position:absolute;inset:0;opacity:.024;mix-blend-mode:multiply}
+
+/* ---------- 幻灯片外壳 ---------- */
+.deck{position:relative;z-index:1;height:100%;}
+.slide{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:clamp(56px,7vh,96px) var(--pad) clamp(84px,11vh,110px);
+  opacity:0;visibility:hidden;pointer-events:none;
+  overflow-y:auto;
+}
+.slide.on{opacity:1;visibility:visible;pointer-events:auto}
+.wrap{width:100%;max-width:1180px;margin:0 auto}
+
+/* 入场：错峰浮起。MG 的节奏来自延迟差，不是来自幅度 */
+.slide.on .fx{animation:rise .62s var(--glide) both;animation-delay:var(--d,0ms)}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+
+/* ---------- 排字 ---------- */
+.eyebrow{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--moss);
+  display:flex;align-items:center;gap:10px;margin-bottom:18px;
+}
+.eyebrow::before{content:"";width:15px;height:2px;background:var(--lime);flex:none}
+h1{font-size:clamp(40px,6.6vw,86px);font-weight:800;letter-spacing:-.038em;line-height:1.04;text-wrap:balance}
+h2{font-size:clamp(27px,3.9vw,48px);font-weight:750;letter-spacing:-.028em;line-height:1.14;text-wrap:balance}
+.lead{font-size:clamp(15px,1.5vw,19px);color:var(--ink-2);max-width:60ch;margin-top:16px;line-height:1.68}
+.sub{font-size:clamp(14px,1.3vw,16.5px);color:var(--ink-mute);max-width:62ch;margin-top:12px}
+.kicker{font-size:clamp(17px,2vw,23px);font-weight:650;color:var(--kombu);margin-top:24px;text-wrap:balance}
+strong{font-weight:750;color:var(--ink)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* ---------- 面板 ---------- */
+.panel{
+  background:var(--surface);border:1px solid var(--hair);border-radius:16px;
+  padding:22px 24px;box-shadow:0 1px 2px rgba(23,21,14,.04),0 14px 34px -26px rgba(23,21,14,.3);
+}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:860px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+.tag{
+  display:inline-flex;align-items:center;gap:7px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink-mute);
+}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--lime);flex:none}
+.dot.bad{background:var(--rust)}
+.dot.warn{background:var(--amber)}
+
+/* ---------- 封面 ---------- */
+.cover-nums{display:flex;align-items:baseline;gap:clamp(18px,4vw,54px);flex-wrap:wrap;margin:34px 0 8px}
+.cover-nums b{
+  font-family:var(--mono);font-weight:700;font-size:clamp(52px,10vw,132px);
+  letter-spacing:-.05em;line-height:.92;
+}
+.cover-nums .a{color:var(--moss)}
+.cover-nums .b{color:var(--rust)}
+.cover-nums i{font-style:normal;font-size:clamp(15px,1.6vw,19px);color:var(--ink-mute);font-family:var(--sans)}
+.vs{font-family:var(--mono);font-size:clamp(15px,1.8vw,22px);color:var(--ink-faint);letter-spacing:.1em}
+
+/* ---------- 产品缩略图（CSS 画的，不是截图） ---------- */
+.mock{
+  display:grid;grid-template-columns:104px 1fr;height:212px;
+  border:1px solid var(--hair);border-radius:14px;overflow:hidden;background:var(--surface);
+}
+.mock-rail{
+  background:linear-gradient(180deg,rgba(250,248,243,.9),rgba(240,237,230,.7));
+  border-right:1px solid var(--hair);padding:13px 9px;display:flex;flex-direction:column;gap:6px;
+}
+.mock-rail .r{height:8px;border-radius:99px;background:rgba(23,21,14,.10)}
+.mock-rail .r.w{width:66%} .mock-rail .r.n{width:84%}
+.mock-rail .r.sel{
+  background:linear-gradient(168deg,rgba(255,255,255,.9),rgba(232,238,223,.6));
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.7),0 3px 9px -5px rgba(23,21,14,.3);
+  height:17px;position:relative;
+}
+.mock-rail .r.sel::after{content:"";position:absolute;left:6px;top:6px;width:5px;height:5px;border-radius:50%;background:var(--lime)}
+.mock-body{padding:14px 15px;display:flex;flex-direction:column;gap:9px}
+.mock-body .h{height:13px;width:38%;border-radius:4px;background:rgba(23,21,14,.20)}
+.mock-body .l{height:7px;border-radius:99px;background:rgba(23,21,14,.085)}
+.mock-body .l.s{width:52%} .mock-body .l.m{width:76%}
+.mock-row{display:flex;gap:8px;margin-top:3px}
+.mock-row .c{flex:1;height:44px;border-radius:9px;background:var(--surface-2);border:1px solid var(--hair-soft)}
+
+/* ---------- 条形对比 ---------- */
+.bars{display:flex;flex-direction:column;gap:18px;margin-top:8px}
+.bar-row{display:grid;grid-template-columns:minmax(130px,190px) 1fr;gap:18px;align-items:center}
+@media(max-width:720px){.bar-row{grid-template-columns:1fr;gap:6px}}
+.bar-label .t{font-size:14.5px;font-weight:600}
+.bar-label .s{font-size:12px;color:var(--ink-mute);font-family:var(--mono)}
+.bar-track{height:34px;border-radius:8px;background:rgba(23,21,14,.055);position:relative;overflow:hidden}
+.bar-fill{
+  position:absolute;left:0;top:0;bottom:0;width:0;border-radius:8px;
+  transition:width 1.15s var(--glide);transition-delay:var(--bd,200ms);
+}
+/* 快的那两条按比例只有百分之一宽，画出来是一条看不见的线，
+   读起来像「什么都没发生」，反而把「它很快」这件事讲没了。
+   给一个最小可见宽度，比例关系仍然对得上。 */
+.slide.on .bar-fill{min-width:14px}
+.bar-fill.ok{background:linear-gradient(90deg,var(--moss),var(--arti))}
+.bar-fill.bad{background:linear-gradient(90deg,var(--rust),#C58163)}
+.bar-val{
+  position:absolute;top:50%;transform:translateY(-50%);left:calc(var(--w) + 12px);
+  font-family:var(--mono);font-size:15px;font-weight:700;white-space:nowrap;
+  opacity:0;transition:opacity .4s var(--fade);transition-delay:calc(var(--bd,200ms) + .8s);
+}
+.slide.on .bar-fill{width:var(--w)}
+.slide.on .bar-val{opacity:1}
+.bar-val.inside{left:auto;right:12px;color:#F7F6F1}
+
+.hero-num{
+  font-family:var(--mono);font-weight:700;letter-spacing:-.04em;
+  font-size:clamp(44px,7.4vw,96px);line-height:1;
+}
+.hero-num.ok{color:var(--moss)} .hero-num.bad{color:var(--rust)}
+.hero-cap{font-size:13.5px;color:var(--ink-mute);margin-top:8px}
+
+/* ---------- 点阵（一个住客 vs 三十个） ---------- */
+.dots{display:flex;flex-wrap:wrap;gap:7px;max-width:270px}
+.dots span{
+  width:15px;height:15px;border-radius:50%;background:var(--arti);opacity:.34;
+  animation:pop .4s var(--spring) both;animation-delay:calc(var(--i)*22ms + 320ms);
+}
+.dots.one span{background:var(--moss);opacity:1;width:19px;height:19px}
+@keyframes pop{from{opacity:0;transform:scale(.3)}to{opacity:.34;transform:none}}
+.dots.one span{animation-name:pop1}
+@keyframes pop1{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:none}}
+
+/* ---------- 台阶 ---------- */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-items:end}
+@media(max-width:860px){.steps{grid-template-columns:1fr}}
+.step{background:var(--surface);border:1px solid var(--hair);border-radius:14px;padding:20px 20px 22px;position:relative}
+.step .bar{height:5px;border-radius:99px;margin-bottom:16px}
+.step.s1{}.step.s2{}.step.s3{}
+.step.s1 .bar{background:var(--lime);width:22%}
+.step.s2 .bar{background:var(--arti);width:56%}
+.step.s3 .bar{background:var(--kombu);width:100%}
+.step h3{font-size:20px;font-weight:750;letter-spacing:-.02em}
+.step .who{font-size:13px;color:var(--ink-mute);margin-top:7px;line-height:1.6}
+.step .cost{font-family:var(--mono);font-size:12.5px;color:var(--moss);margin-top:14px;font-weight:600}
+@media(min-width:861px){.step.s1{margin-bottom:52px}.step.s2{margin-bottom:26px}}
+
+/* ---------- 表格式清单 ---------- */
+.rows{display:flex;flex-direction:column}
+.row{
+  display:grid;grid-template-columns:minmax(150px,1fr) 1.6fr;gap:22px;
+  padding:15px 4px;border-bottom:1px solid var(--hair);align-items:baseline;
+}
+@media(max-width:720px){.row{grid-template-columns:1fr;gap:4px}}
+.row:last-child{border-bottom:0}
+.row .k{font-weight:650;font-size:15.5px;display:flex;align-items:center;gap:9px}
+.row .v{font-size:14.5px;color:var(--ink-2);line-height:1.6}
+.row.hot .v{color:var(--rust)}
+.row .wk{font-family:var(--mono);font-size:12px;color:var(--ink-faint);margin-left:auto;flex:none}
+
+/* ---------- 时间轴 ---------- */
+.rail{position:relative;margin-top:34px;padding-top:38px}
+.rail::before{content:"";position:absolute;left:0;right:0;top:8px;height:2px;background:var(--hair)}
+.rail-fill{position:absolute;left:0;top:8px;height:2px;width:0;background:var(--lime);transition:width 1.4s var(--glide) .3s}
+.slide.on .rail-fill{width:100%}
+.nodes{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+@media(max-width:860px){.nodes{grid-template-columns:1fr;gap:16px}.rail::before,.rail-fill{display:none}}
+.node{position:relative}
+.node::before{
+  content:"";position:absolute;top:-38px;left:0;width:11px;height:11px;border-radius:50%;
+  background:var(--surface);border:2px solid var(--moss);
+  animation:pop1 .42s var(--spring) both;animation-delay:calc(var(--i)*180ms + 420ms);
+}
+@media(max-width:860px){.node::before{display:none}}
+.node .wk{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--moss);text-transform:uppercase}
+.node .t{font-size:14.5px;font-weight:650;margin-top:6px;line-height:1.45}
+.node .d{font-size:12.5px;color:var(--ink-mute);margin-top:5px;line-height:1.55}
+
+/* ---------- 引言块 ---------- */
+.quote{
+  border-left:3px solid var(--lime);padding:4px 0 4px 22px;
+  font-size:clamp(18px,2.3vw,27px);font-weight:650;letter-spacing:-.018em;line-height:1.42;
+  color:var(--kombu);text-wrap:balance;
+}
+
+/* ---------- 导航 ---------- */
+.hud{
+  position:fixed;left:0;right:0;bottom:0;z-index:20;
+  display:flex;align-items:center;gap:16px;
+  padding:14px var(--pad) 16px;
+  background:linear-gradient(180deg,rgba(234,232,224,0),rgba(234,232,224,.86) 42%);
+}
+.pips{display:flex;gap:6px;flex:1;flex-wrap:wrap}
+.pip{
+  width:26px;height:4px;border-radius:99px;background:rgba(23,21,14,.13);
+  border:0;padding:0;cursor:pointer;transition:background .3s var(--fade),transform .3s var(--spring);
+}
+.pip:hover{background:rgba(23,21,14,.28);transform:scaleY(1.6)}
+.pip.on{background:var(--moss)}
+.pip:focus-visible{outline:2px solid var(--moss);outline-offset:3px}
+.count{font-family:var(--mono);font-size:12px;color:var(--ink-mute);flex:none;font-variant-numeric:tabular-nums}
+.arrows{display:flex;gap:8px;flex:none}
+.arrows button{
+  width:36px;height:36px;border-radius:50%;border:1px solid var(--hair);
+  background:var(--surface);color:var(--ink-2);cursor:pointer;font-size:14px;
+  display:grid;place-items:center;
+  transition:transform .24s var(--spring),border-color .2s var(--fade),color .2s var(--fade);
+}
+.arrows button:hover{transform:translateY(-2px);border-color:var(--moss);color:var(--kombu)}
+.arrows button:active{transform:translateY(0) scale(.95)}
+.arrows button:disabled{opacity:.32;cursor:default;transform:none}
+.arrows button:focus-visible{outline:2px solid var(--moss);outline-offset:2px}
+
+.hint{
+  position:fixed;top:18px;right:var(--pad);z-index:20;
+  font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink-faint);animation:fadeOut .6s var(--fade) 5s both;
+}
+@keyframes fadeOut{to{opacity:0;visibility:hidden}}
+
+figure{margin:0}
+figcaption{font-size:12.5px;color:var(--ink-mute);margin-top:10px}
+svg{max-width:100%;height:auto;display:block}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;transition-duration:.001ms !important}
+}
+</style>
+
+<div class="bg">
+  <svg class="grain" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="3" stitchTiles="stitch"/></filter>
+    <rect width="100%" height="100%" filter="url(#gr)"/>
+  </svg>
+</div>
+
+<div class="hint">← → 翻页</div>
+
+<div class="deck" id="deck">
+
+<!-- 1 封面 -->
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow fx" style="--d:0ms">SEDNA CARE 院舍照护管理</div>
+    <h1 class="fx" style="--d:60ms">两天，和二十五周</h1>
+    <div class="cover-nums fx" style="--d:180ms">
+      <div><b class="a num">2</b> <i>天</i><div class="hero-cap">做一个能跑的系统</div></div>
+      <div class="vs">→</div>
+      <div><b class="b num">25</b> <i>周</i><div class="hero-cap">做一个能扛的系统</div></div>
+    </div>
+    <p class="lead fx" style="--d:300ms">这两个数字都是真的。它们不矛盾。<br>下面用这个项目上真实发生的四件事，说明中间隔着什么。</p>
+  </div>
+</section>
+
+<!-- 2 已经能跑 -->
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow fx" style="--d:0ms">现状</div>
+    <h2 class="fx" style="--d:60ms">这些已经在跑了</h2>
+    <p class="sub fx" style="--d:120ms">不是效果图，是真的软件。您现在就可以打开来点。</p>
+    <div class="grid g2" style="margin-top:30px;align-items:center">
+      <div class="mock fx" style="--d:220ms">
+        <div class="mock-rail">
+          <div class="r w"></div><div class="r n"></div><div class="r w"></div>
+          <div class="r sel"></div>
+          <div class="r n"></div><div class="r w"></div>
+        </div>
+        <div class="mock-body">
+          <div class="h"></div>
+          <div class="l m"></div><div class="l s"></div>
+          <div class="mock-row"><div class="c"></div><div class="c"></div><div class="c"></div></div>
+          <div class="l m"></div><div class="l s"></div>
+        </div>
+      </div>
+      <div class="rows fx" style="--d:320ms">
+        <div class="row"><div class="k"><span class="dot"></span>三种角色</div><div class="v">职员、组长、管理员，同一页看到的数据不一样</div></div>
+        <div class="row"><div class="k"><span class="dot"></span>住客名单</div><div class="v">Excel 导入，第几行为什么没进去会告诉您</div></div>
+        <div class="row"><div class="k"><span class="dot"></span>合规看板</div><div class="v">资助目标、评估到期、做完没填表</div></div>
+        <div class="row"><div class="k"><span class="dot"></span>操作留痕</div><div class="v">谁、什么时候、改前改后，只能追加</div></div>
+        <div class="row"><div class="k"><span class="dot"></span>规范问答</div><div class="v">每句话标注引自哪份文件哪一节</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 为什么快 -->
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow fx" style="--d:0ms">为什么这么快</div>
+    <h2 class="fx" style="--d:60ms">给一个人看的系统，是一条直路</h2>
+    <figure class="fx" style="--d:200ms;margin-top:34px">
+      <svg viewBox="0 0 900 260" role="img" aria-label="演示系统是一条直路，真实系统同一条路上多出六道关卡">
+        <defs>
+          <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <polygon points="0,0 10,5 0,10" fill="currentColor"/>
+          </marker>
+          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <polygon points="0,0 10,5 0,10" fill="#A15C3E"/>
+          </marker>
+        </defs>
+        <g font-family="Be Vietnam Pro, sans-serif" font-size="13" fill="currentColor">
+          <text x="0" y="26" font-size="11" letter-spacing="2" fill="#767267">演示　一个人</text>
+          <rect x="0" y="42" width="122" height="44" rx="9" fill="#FAF8F3" stroke="rgba(23,21,14,.14)"/>
+          <text x="61" y="69" text-anchor="middle">您点一下</text>
+          <line x1="132" y1="64" x2="386" y2="64" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
+          <text x="259" y="55" text-anchor="middle" font-size="11.5" fill="#767267">直接读数据</text>
+          <rect x="398" y="42" width="122" height="44" rx="9" fill="#FAF8F3" stroke="rgba(23,21,14,.14)"/>
+          <text x="459" y="69" text-anchor="middle">看到结果</text>
+          <text x="548" y="69" font-size="12.5" fill="#43613C" font-weight="600">两天做得完</text>
+
+          <text x="0" y="152" font-size="11" letter-spacing="2" fill="#767267">上线　几十个人</text>
+          <rect x="0" y="168" width="122" height="44" rx="9" fill="#FAF8F3" stroke="rgba(23,21,14,.14)"/>
+          <text x="61" y="195" text-anchor="middle">同事点一下</text>
+          <line x1="132" y1="190" x2="386" y2="190" stroke="#A15C3E" stroke-width="1.4" marker-end="url(#arr)"/>
+          <g font-size="10.5" fill="#A15C3E" text-anchor="middle">
+            <line x1="168" y1="176" x2="168" y2="204" stroke="#A15C3E" stroke-width="1.2"/>
+            <line x1="204" y1="176" x2="204" y2="204" stroke="#A15C3E" stroke-width="1.2"/>
+            <line x1="240" y1="176" x2="240" y2="204" stroke="#A15C3E" stroke-width="1.2"/>
+            <line x1="276" y1="176" x2="276" y2="204" stroke="#A15C3E" stroke-width="1.2"/>
+            <line x1="312" y1="176" x2="312" y2="204" stroke="#A15C3E" stroke-width="1.2"/>
+            <line x1="348" y1="176" x2="348" y2="204" stroke="#A15C3E" stroke-width="1.2"/>
+            <text x="259" y="224">他是谁 · 能看谁的 · 记下来 · 数据大了还快吗 · 别人同时在改 · 出错怎么办</text>
+          </g>
+          <rect x="398" y="168" width="122" height="44" rx="9" fill="#FAF8F3" stroke="rgba(23,21,14,.14)"/>
+          <text x="459" y="195" text-anchor="middle">看到结果</text>
+          <text x="548" y="195" font-size="12.5" fill="#A15C3E" font-weight="600">六道关卡，一道都不能省</text>
+        </g>
+      </svg>
+      <figcaption>同样是「点一下看到结果」，演示只要走通中间那根线，上线要走通线上的每一道关卡。</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- 4 案例一：索引 -->
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow fx" style="--d:0ms">真事一　速度</div>
+    <h2 class="fx" style="--d:60ms">同一页，同一句查询，一行代码没改</h2>
+    <p class="sub fx" style="--d:120ms">合规看板上的「做完了但没填表」。上个礼拜我把数据放大到三间院舍跑三年的量。</p>
+    <div class="bars fx" style="--d:240ms;margin-top:32px">
+      <div class="bar-row">
+        <div class="bar-label"><div class="t">现在的演示资料</div><div class="s">3,080 节</div></div>
+        <div class="bar-track"><div class="bar-fill ok" style="--w:1%;--bd:300ms"></div><div class="bar-val" style="--w:1%;--bd:300ms;color:var(--moss)">0.19 秒</div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label"><div class="t">三间院舍跑三年</div><div class="s">150,000 节</div></div>
+        <div class="bar-track"><div class="bar-fill bad" style="--w:100%;--bd:700ms"></div><div class="bar-val inside" style="--bd:700ms">18.7 秒</div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label"><div class="t">补上一行之后</div><div class="s">同样 150,000 节</div></div>
+        <div class="bar-track"><div class="bar-fill ok" style="--w:.4%;--bd:1500ms"></div><div class="bar-val" style="--w:.4%;--bd:1500ms;color:var(--moss)">0.065 秒</div></div>
+      </div>
+    </div>
+    <p class="kicker fx" style="--d:420ms">18.7 秒的时候，同事会以为系统坏了，会按刷新，会打电话给您。<br>而这个问题在今天的演示里根本不存在。</p>
+  </div>
+</section>
+
+<!-- 5 三个猜想 -->
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow fx" style="--d:0ms">真事一　续</div>
+    <h2 class="fx" style="--d:60ms">那一行，写出来五秒钟</h2>
+    <p class="sub fx" style="--d:120ms">难的不是写。难的是知道该写哪一行。我一开始猜有三个地方会慢。</p>
+    <div class="grid g3 fx" style="--d:240ms;margin-top:30px">
+      <div class="panel">
+        <div class="tag"><span class="dot bad"></span>猜想一</div>
+        <div class="hero-num bad" style="font-size:clamp(30px,4vw,46px);margin-top:12px">对了</div>
+        <p class="hero-cap">补上索引，18.7 秒变 0.065 秒。<br>快了 <strong>288 倍</strong>。</p>
+      </div>
+      <div class="panel">
+        <div class="tag"><span class="dot warn"></span>猜想二</div>
+        <div class="hero-num" style="font-size:clamp(30px,4vw,46px);margin-top:12px;color:var(--ink-faint)">白猜</div>
+        <p class="hero-cap">量下去发现本来就够快。<br>不用动。</p>
+      </div>
+      <div class="panel">
+        <div class="tag"><span class="dot bad"></span>猜想三</div>
+        <div class="hero-num bad" style="font-size:clamp(30px,4vw,46px);margin-top:12px">改错了</div>
+        <p class="hero-cap">照直觉动手之后，<br>反而<strong>慢了 40 倍</strong>。</p>
+      </div>
+    </div>
+    <div class="quote fx" style="--d:400ms;margin-top:34px">
+      三个猜想只有一个是对的，另一个照感觉动手会让事情更糟。<br>
+      要分清楚，唯一的办法是把数据放大，一个一个量过去。
+    </div>
+    <p class="sub fx" style="--d:480ms">这就是那份计划里「加固」三到四周在做的事。它看起来最像可以省掉的一段，实际上它决定前面二十周能不能用。</p>
+  </div>
+</section>
+
+<!-- 6 案例二：权限 -->
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow fx" style="--d:0ms">真事二　安全</div>
+    <h2 class="fx" style="--d:60ms">「不同角色看到不同数据」，我踩了四个坑</h2>
+    <p class="sub fx" style="--d:120ms">这一条听起来是最简单的需求。四个坑，一个套一个，全部在演示里看不到。</p>
+    <div class="rows fx" style="--d:240ms;margin-top:26px">
+      <div class="row hot"><div class="k"><span class="dot bad"></span>代码写错</div><div class="v">合规看板本该只给职员看他负责的住客，实际给了整间院舍。职员和组长看到的数字一模一样，权限等于没做。</div></div>
+      <div class="row hot"><div class="k"><span class="dot bad"></span>数据不对</div><div class="v">改对代码后数字还是一样。因为示范数据让每位治疗师都碰过全院每个人，「他负责的住客」算出来就等于「整间院舍」。</div></div>
+      <div class="row hot"><div class="k"><span class="dot bad"></span>手快会白屏</div><div class="v">登入后马上点侧栏，上一页的数据回来把新页面盖掉了。慢慢点永远碰不到，演示那天手快一点就是一片空白。</div></div>
+      <div class="row hot"><div class="k"><span class="dot bad"></span>留痕能被拖走</div><div class="v">分页卡了上限没卡下限。任何一位组长发一个特殊请求，就能把整张操作记录表一次全部拿走。</div></div>
+    </div>
+    <p class="kicker fx" style="--d:420ms">前三个我改完了。第四个是我自己复查时找到的，不是别人来报的。</p>
+  </div>
+</section>
+
+<!-- 7 类比 -->
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow fx" style="--d:0ms">用院舍的话说</div>
+    <h2 class="fx" style="--d:60ms">一个住客，和三十个住客</h2>
+    <div class="grid g2" style="margin-top:34px;gap:34px">
+      <div class="panel fx" style="--d:220ms">
+        <div class="tag"><span class="dot"></span>带一个</div>
+        <div class="dots one" style="margin:20px 0 18px"><span style="--i:0"></span></div>
+        <p class="sub" style="margin:0">不需要任何系统。她记得住，出了事她自己清楚。</p>
+      </div>
+      <div class="panel fx" style="--d:320ms">
+        <div class="tag"><span class="dot"></span>带三十个，三班交更</div>
+        <div class="dots" id="dots30" style="margin:20px 0 18px"></div>
+        <p class="sub" style="margin:0">交更要交接，记录要能追溯，有人请假要有人补位，补位的人要知道前面发生过什么。社署随时会来查。</p>
+      </div>
+    </div>
+    <p class="kicker fx" style="--d:440ms">不是这位治疗师变笨了，是规模本身会生出新问题。<br>软件一模一样。给您看的这套，和几十个人天天用的那套，代码看起来几乎相同，差别全在您看不见的地方。</p>
+  </div>
+</section>
+
+<!-- 8 三层 -->
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow fx" style="--d:0ms">三个阶段</div>
+    <h2 class="fx" style="--d:60ms">能跑，能用，能扛</h2>
+    <p class="sub fx" style="--d:120ms">这三段的代码看起来几乎一样。这就是为什么它是隐形的。</p>
+    <div class="steps" style="margin-top:34px">
+      <div class="step s1 fx" style="--d:240ms">
+        <div class="bar"></div>
+        <h3>能跑</h3>
+        <p class="who">给一个人看。您说的完全正确，而且它已经做出来了。</p>
+        <div class="cost">1 到 2 天</div>
+      </div>
+      <div class="step s2 fx" style="--d:340ms">
+        <div class="bar"></div>
+        <h3>能用</h3>
+        <p class="who">一间院舍，五到十个人，您在旁边盯着，出问题当场喊人。</p>
+        <div class="cost">约 10 周</div>
+      </div>
+      <div class="step s3 fx" style="--d:440ms">
+        <div class="bar"></div>
+        <h3>能扛</h3>
+        <p class="who">三间院舍，几十人同时用，社署随时来查，有人离职要交接，资料保存七年。</p>
+        <div class="cost">约 25 周</div>
+      </div>
+    </div>
+    <p class="kicker fx" style="--d:560ms">那二十五周不在「能跑」里面，全部花在从能跑走到能扛的这段路上。</p>
+  </div>
+</section>
+
+<!-- 9 代价不对称 -->
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow fx" style="--d:0ms">为什么不能先上线再补</div>
+    <h2 class="fx" style="--d:60ms">在这一行，做错的代价不对称</h2>
+    <div class="rows fx" style="--d:200ms;margin-top:26px">
+      <div class="row"><div class="k"><span class="dot"></span>排班排错了</div><div class="v" style="color:var(--moss);font-weight:600">改一下，重新发一次</div></div>
+      <div class="row hot"><div class="k"><span class="dot bad"></span>权限漏了</div><div class="v">住客健康资料外泄。个人资料私隐条例，罚款加牌照风险</div></div>
+      <div class="row hot"><div class="k"><span class="dot bad"></span>留痕漏了</div><div class="v">稽查问「这条记录谁改的」，答不出来</div></div>
+      <div class="row hot"><div class="k"><span class="dot bad"></span>资料丢了</div><div class="v">违反七年保存要求</div></div>
+    </div>
+    <p class="kicker fx" style="--d:400ms">第一行改一下就好。下面三行没有「改一下」这个选项。<br>所以最像可以省掉的那部分，恰恰是最不能省的。</p>
+  </div>
+</section>
+
+<!-- 10 25周在做什么 -->
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow fx" style="--d:0ms">这二十五周在做什么</div>
+    <h2 class="fx" style="--d:60ms">用「不做会怎样」来看</h2>
+    <div class="rows fx" style="--d:200ms;margin-top:22px">
+      <div class="row"><div class="k">基础 <span class="wk">4 周</span></div><div class="v">不做，谁都能看到谁的资料</div></div>
+      <div class="row"><div class="k">每日流程 <span class="wk">5–6 周</span></div><div class="v">不做，系统没人用，因为它不跟着实际工作走</div></div>
+      <div class="row"><div class="k">合规与分析 <span class="wk">3–4 周</span></div><div class="v">不做，社署来查，答不出这条记录谁改的</div></div>
+      <div class="row"><div class="k">排班引擎 <span class="wk">5–7 周</span></div><div class="v">不做，排班还是在 Excel 里做</div></div>
+      <div class="row"><div class="k">AI 功能 <span class="wk">3–5 周</span></div><div class="v">看要做哪些，另外谈</div></div>
+      <div class="row hot"><div class="k"><span class="dot bad"></span>加固 <span class="wk">3–4 周</span></div><div class="v">不做，上面五项全部做完，然后数据长起来之后开始出事</div></div>
+    </div>
+    <p class="kicker fx" style="--d:420ms">最后一行最容易被砍掉。砍掉之后，前面五行全部作废。</p>
+  </div>
+</section>
+
+<!-- 11 五个节点 -->
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow fx" style="--d:0ms">交付节奏</div>
+    <h2 class="fx" style="--d:60ms">不是二十五周之后才交货</h2>
+    <p class="sub fx" style="--d:120ms">每四到六周交一次，每一次交的都是您可以自己打开来点的东西。</p>
+    <div class="rail fx" style="--d:240ms">
+      <div class="rail-fill"></div>
+      <div class="nodes">
+        <div class="node" style="--i:0"><div class="wk">第 4 周</div><div class="t">能登入</div><div class="d">三种角色，住客名单进系统</div></div>
+        <div class="node" style="--i:1"><div class="wk">第 10 周</div><div class="t">一间院舍试用</div><div class="d">每日流程跑通，前线开始真的用</div></div>
+        <div class="node" style="--i:2"><div class="wk">第 14 周</div><div class="t">合规能交差</div><div class="d">留痕与合规看板，可以拿去应付稽查</div></div>
+        <div class="node" style="--i:3"><div class="wk">第 21 周</div><div class="t">排班搬进来</div><div class="d">从 Excel 搬进系统</div></div>
+        <div class="node" style="--i:4"><div class="wk">第 25 周</div><div class="t">三间全上</div><div class="d">全部院舍上线</div></div>
+      </div>
+    </div>
+    <div class="quote fx" style="--d:520ms;margin-top:38px">
+      每一个节点您都可以喊停。<br>
+      二十五周听起来是押二十五周的注，五个节点是押四周的注，看到结果满意了再押下一注。
+    </div>
+  </div>
+</section>
+
+<!-- 12 卡在哪 -->
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow fx" style="--d:0ms">最后一件事</div>
+    <h2 class="fx" style="--d:60ms">写代码从来不是瓶颈</h2>
+    <p class="sub fx" style="--d:120ms">这套演示系统就是证据。真正决定这个项目要多久的，是三件我现在还不知道的事。</p>
+    <div class="grid g3 fx" style="--d:240ms;margin-top:30px">
+      <div class="panel">
+        <div class="tag"><span class="dot warn"></span>要访谈同事</div>
+        <h3 style="font-size:19px;font-weight:750;margin-top:12px">排班的规则</h3>
+        <p class="hero-cap" style="margin-top:10px">资质怎么配、连续工时上限、复康频次、场地冲突、临时补位。这些只存在同事脑子里。问错一条，整张排班表作废。</p>
+      </div>
+      <div class="panel">
+        <div class="tag"><span class="dot warn"></span>要业务确认</div>
+        <h3 style="font-size:19px;font-weight:750;margin-top:12px">资助申报口径</h3>
+        <p class="hero-cap" style="margin-top:10px">甲一买位、合约资助宿位、院舍券、私位，对应不同的资助与服务量要求。演示里的每周目标是我假设的。</p>
+      </div>
+      <div class="panel">
+        <div class="tag"><span class="dot bad"></span>要法务点头</div>
+        <h3 style="font-size:19px;font-weight:750;margin-top:12px">跨境资料合规</h3>
+        <p class="hero-cap" style="margin-top:10px">主体在香港，住客健康资料受私隐条例规管，开发在深圳。资料落在哪一侧必须在架构定案前确认，之后再改等于推倒重来。</p>
+      </div>
+    </div>
+    <p class="kicker fx" style="--d:420ms">这三件事您一个电话可能就解决了，我自己猜三个礼拜也猜不对。<br>它们确认之后，上面的区间可以收窄很多，节点也可以按您的优先级重排。</p>
+  </div>
+</section>
+
+</div>
+
+<div class="hud">
+  <div class="pips" id="pips"></div>
+  <div class="count" id="count">01 / 12</div>
+  <div class="arrows">
+    <button id="prev" aria-label="上一页">←</button>
+    <button id="next" aria-label="下一页">→</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  var slides = [].slice.call(document.querySelectorAll('.slide'));
+  var pips = document.getElementById('pips');
+  var count = document.getElementById('count');
+  var prev = document.getElementById('prev');
+  var next = document.getElementById('next');
+  var i = 0;
+
+  // 三十个点，用 JS 生成，省掉三十行手写标签
+  var d30 = document.getElementById('dots30');
+  for (var k = 0; k < 30; k++) {
+    var s = document.createElement('span');
+    s.style.setProperty('--i', k);
+    d30.appendChild(s);
+  }
+
+  slides.forEach(function(_, n){
+    var b = document.createElement('button');
+    b.className = 'pip';
+    b.setAttribute('aria-label', '第 ' + (n + 1) + ' 页');
+    b.addEventListener('click', function(){ go(n); });
+    pips.appendChild(b);
+  });
+  var pipEls = [].slice.call(pips.children);
+
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+
+  function go(n){
+    if (n < 0 || n >= slides.length) return;
+    // 先摘掉 on，动画类才会在下次挂上时重新播一遍
+    slides[i].classList.remove('on');
+    i = n;
+    var el = slides[i];
+    void el.offsetWidth;
+    el.classList.add('on');
+    el.scrollTop = 0;
+    pipEls.forEach(function(p, x){ p.classList.toggle('on', x === i); });
+    count.textContent = pad(i + 1) + ' / ' + pad(slides.length);
+    prev.disabled = i === 0;
+    next.disabled = i === slides.length - 1;
+  }
+
+  prev.addEventListener('click', function(){ go(i - 1); });
+  next.addEventListener('click', function(){ go(i + 1); });
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(i + 1); }
+    if (e.key === 'ArrowLeft'  || e.key === 'PageUp')  { e.preventDefault(); go(i - 1); }
+    if (e.key === 'Home') { e.preventDefault(); go(0); }
+    if (e.key === 'End')  { e.preventDefault(); go(slides.length - 1); }
+  });
+
+  // 点空白处翻页，但别抢走按钮和 pip 的点击
+  document.addEventListener('click', function(e){
+    if (e.target.closest('.hud')) return;
+    go(i + 1);
+  });
+
+  go(0);
+})();
+</script>
