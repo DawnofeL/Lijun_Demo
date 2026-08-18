@@ -1,18 +1,18 @@
 <meta charset="utf-8">
-<title>项目工期说明</title>
+<title>專案工期說明</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap">
 
 <style>
-/* 沿用 SEDNA CARE 的设计令牌。暖纸三阶、森林绿、柠檬绿只表达「已有」、
-   赤陶只表达「缺口」。三条缓动曲线，不多不少。 */
+/* 沿用 SEDNA CARE 的設計令牌。暖紙三階、森林綠、檸檬綠只表達「已有」、
+   赤陶只表達「缺口」、琥珀只表達「選配」。三條緩動曲線，不多不少。 */
 :root{
   --paper:#EAE8E0; --paper-2:#EFEDE6; --surface:#FAF8F3; --surface-2:#F5F2EB;
   --ink:#17150E; --ink-2:#3D3A31; --ink-mute:#767267; --ink-faint:#A5A195;
   --hair:rgba(23,21,14,.09); --hair-soft:rgba(23,21,14,.055);
   --moss:#43613C; --kombu:#2A4A2E; --arti:#7A9169; --lime:#AFC244;
   --rust:#A15C3E; --amber:#9A6C08;
-  --sans:"Be Vietnam Pro","PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif;
+  --sans:"Be Vietnam Pro","PingFang HK","PingFang TC","Microsoft JhengHei","Noto Sans CJK TC",sans-serif;
   --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   --spring:cubic-bezier(.34,1.42,.64,1);
   --glide:cubic-bezier(.32,.72,0,1);
@@ -26,7 +26,6 @@ body{
   font-family:var(--sans);font-size:16px;line-height:1.62;
   -webkit-font-smoothing:antialiased;overflow:hidden;
 }
-
 .bg{position:fixed;inset:0;z-index:0;pointer-events:none}
 .bg::before{
   content:"";position:absolute;inset:0;
@@ -37,12 +36,12 @@ body{
 }
 .grain{position:absolute;inset:0;opacity:.024;mix-blend-mode:multiply}
 
-/* ---------- 幻灯片外壳 ---------- */
+/* ---------- 投影片外殼 ---------- */
 .deck{position:relative;z-index:1;height:100%}
 .slide{
   position:absolute;inset:0;
   display:flex;flex-direction:column;justify-content:center;
-  padding:clamp(50px,6vh,84px) var(--pad) clamp(80px,10vh,104px);
+  padding:clamp(46px,5.5vh,80px) var(--pad) clamp(78px,10vh,102px);
   opacity:0;visibility:hidden;pointer-events:none;overflow-y:auto;
 }
 .slide.on{opacity:1;visibility:visible;pointer-events:auto}
@@ -59,39 +58,37 @@ body{
 .eyebrow.late{color:var(--amber)}
 .eyebrow.late::before{background:var(--amber)}
 h1{font-size:clamp(38px,6vw,78px);font-weight:800;letter-spacing:-.038em;line-height:1.05;text-wrap:balance}
-h2{font-size:clamp(28px,4.1vw,52px);font-weight:750;letter-spacing:-.03em;line-height:1.1;text-wrap:balance}
+h2{font-size:clamp(26px,3.9vw,50px);font-weight:750;letter-spacing:-.03em;line-height:1.12;text-wrap:balance}
 .lead{font-size:clamp(15px,1.5vw,19px);color:var(--ink-2);max-width:60ch;margin-top:18px;line-height:1.7}
-.sub{font-size:clamp(13.5px,1.25vw,16px);color:var(--ink-mute);max-width:64ch;margin-top:10px}
+.sub{font-size:clamp(13.5px,1.25vw,16px);color:var(--ink-mute);max-width:66ch;margin-top:10px}
 strong{font-weight:750;color:var(--ink)}
 .num{font-family:var(--mono);font-variant-numeric:tabular-nums}
 
-/* ---------- 功能页的页头：左标题，右周期 ---------- */
-.fhead{display:flex;align-items:flex-end;justify-content:space-between;gap:28px;flex-wrap:wrap}
-.fhead .l{flex:1;min-width:280px}
-.cost{
-  flex:none;text-align:right;padding-left:22px;border-left:1px solid var(--hair);
-}
+/* ---------- 功能頁頁首：左標題，右週期 ---------- */
+.fhead{display:flex;align-items:flex-end;justify-content:space-between;gap:26px;flex-wrap:wrap}
+.fhead .l{flex:1;min-width:290px}
+.cost{flex:none;text-align:right;padding-left:22px;border-left:1px solid var(--hair)}
 .cost .who{
   font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;
   color:var(--ink-faint);display:block;margin-bottom:6px;white-space:nowrap;
 }
 .cost b{
   font-family:var(--mono);font-weight:700;letter-spacing:-.04em;line-height:1;
-  font-size:clamp(38px,5.4vw,64px);color:var(--moss);
+  font-size:clamp(32px,4.6vw,56px);color:var(--moss);white-space:nowrap;
 }
 .cost.opt b{color:var(--amber)}
-.cost .u{font-size:15px;color:var(--ink-mute);margin-left:4px}
+.cost .u{font-size:14px;color:var(--ink-mute);margin-left:4px}
 
-/* ---------- 缺口对比 ---------- */
-.vs2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:30px}
+/* ---------- 缺口對比 ---------- */
+.vs2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:28px}
 @media(max-width:860px){.vs2{grid-template-columns:1fr}}
-.side{border-radius:16px;padding:22px 24px 24px;border:1px solid var(--hair)}
+.side{border-radius:16px;padding:21px 23px 23px;border:1px solid var(--hair)}
 .side .st{
   font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
-  display:flex;align-items:center;gap:8px;margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;margin-bottom:13px;
 }
-.side p{font-size:clamp(14px,1.35vw,16.5px);line-height:1.72;color:var(--ink-2)}
-.side p + p{margin-top:11px}
+.side p{font-size:clamp(13.5px,1.3vw,16px);line-height:1.72;color:var(--ink-2)}
+.side p + p{margin-top:10px}
 .side.bad{
   border-color:rgba(161,92,62,.22);
   background:
@@ -105,24 +102,21 @@ strong{font-weight:750;color:var(--ink)}
 .dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
 
 /* ---------- 表格 ---------- */
-.tbl{width:100%;border-collapse:collapse;margin-top:22px}
+.tbl{width:100%;border-collapse:collapse;margin-top:20px}
 .tbl th{
   text-align:left;font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;
   text-transform:uppercase;color:var(--ink-faint);font-weight:500;
-  padding:0 12px 11px;border-bottom:1px solid var(--hair);
+  padding:0 12px 10px;border-bottom:1px solid var(--hair);
 }
 .tbl th.r,.tbl td.r{text-align:right}
-.tbl td{padding:12px;border-bottom:1px solid var(--hair);font-size:14.5px;vertical-align:top}
+.tbl td{padding:11px 12px;border-bottom:1px solid var(--hair);font-size:14px;vertical-align:top}
 .tbl tr:last-child td{border-bottom:0}
 .tbl td.k{font-weight:650;white-space:nowrap}
-.tbl td.d{color:var(--ink-mute);font-size:13.5px}
+.tbl td.d{color:var(--ink-mute);font-size:13px}
 .tbl td.w{font-family:var(--mono);font-weight:700;color:var(--moss);white-space:nowrap}
 .tbl td.w.opt{color:var(--amber)}
-.tbl tfoot td{
-  border-top:2px solid var(--hair);border-bottom:0;padding-top:14px;
-  font-weight:750;font-size:16px;
-}
-.tbl tfoot td.w{font-size:20px}
+.tbl tfoot td{border-top:2px solid var(--hair);border-bottom:0;padding-top:13px;font-weight:750;font-size:15px}
+.tbl tfoot td.w{font-size:19px}
 .ok-chip{
   display:inline-flex;align-items:center;gap:6px;white-space:nowrap;
   font-family:var(--mono);font-size:11px;font-weight:700;color:var(--moss);
@@ -134,66 +128,116 @@ strong{font-weight:750;color:var(--ink)}
 }
 .tag-mid{color:var(--moss);background:rgba(67,97,60,.10)}
 .tag-late{color:var(--amber);background:rgba(154,108,8,.11)}
+.tbl.tight td{padding:7.5px 12px;font-size:13px}
+.tbl.tight td.d{font-size:12px}
+.tbl.tight tfoot td{padding-top:10px;font-size:14px}
+.tbl.tight tfoot td.w{font-size:16.5px}
 
-/* 总表二行多，单独收紧一档，免得溢出到要卷动 */
-.tbl.tight td{padding:8.5px 12px;font-size:13.5px}
-.tbl.tight td.d{font-size:12.5px}
-.tbl.tight tfoot td{padding-top:11px;font-size:14.5px}
-.tbl.tight tfoot td.w{font-size:17px}
-.tbl.tight + .note{margin-top:16px;padding:12px 18px;font-size:12.5px}
+/* ---------- AI 功能卡 ---------- */
+.ai-list{display:flex;flex-direction:column;gap:12px;margin-top:22px}
+.ai-item{
+  background:var(--surface);border:1px solid var(--hair);border-radius:15px;
+  padding:16px 20px 17px;
+  display:grid;grid-template-columns:1fr auto;gap:5px 18px;align-items:baseline;
+  box-shadow:0 1px 2px rgba(23,21,14,.04),0 10px 26px -22px rgba(23,21,14,.28);
+}
+.ai-item .n{font-size:17.5px;font-weight:750;letter-spacing:-.02em}
+.ai-item .w{font-family:var(--mono);font-weight:700;font-size:16px;color:var(--amber);white-space:nowrap}
+.ai-item .p{grid-column:1/-1;font-size:13.5px;color:var(--ink-mute);line-height:1.64}
+.ai-item .eg{
+  grid-column:1/-1;margin-top:8px;padding:9px 14px;border-radius:10px;
+  background:var(--surface-2);border-left:2px solid var(--lime);
+  font-size:12.8px;color:var(--ink-2);line-height:1.66;
+}
+.ai-item .eg b{color:var(--kombu)}
+
+/* ---------- AI 能力地圖 ---------- */
+.map{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-top:22px}
+@media(max-width:860px){.map{grid-template-columns:1fr}}
+.mcol{background:var(--surface);border:1px solid var(--hair);border-radius:15px;padding:17px 19px 19px}
+.mcol .h{font-size:16px;font-weight:750;letter-spacing:-.02em}
+.mcol .s{font-size:12px;color:var(--ink-mute);margin-top:5px;line-height:1.55;min-height:34px}
+.mcol ul{list-style:none;margin-top:12px;border-top:1px solid var(--hair);padding-top:4px}
+.mcol li{
+  display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+  padding:7px 0;border-bottom:1px solid var(--hair-soft);font-size:13.5px;
+}
+.mcol li:last-child{border-bottom:0}
+.mcol li i{font-style:normal}
+.mcol li em{font-style:normal;font-family:var(--mono);font-weight:700;font-size:13px;color:var(--amber);white-space:nowrap}
+.mcol .tot{
+  margin-top:11px;padding-top:10px;border-top:2px solid var(--hair);
+  display:flex;justify-content:space-between;align-items:baseline;
+  font-weight:750;font-size:14px;
+}
+.mcol .tot em{font-style:normal;font-family:var(--mono);font-size:17px;color:var(--amber)}
+.done-row{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:13px 19px;border-radius:14px;margin-top:20px;
+  background:rgba(67,97,60,.09);border:1px solid rgba(67,97,60,.20);
+}
+.done-row .t{font-weight:750;font-size:15px;color:var(--kombu)}
+.done-row .d{font-size:13px;color:var(--ink-2);flex:1;min-width:240px}
 
 /* ---------- 封面三段 ---------- */
-.phases{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:38px}
+.phases{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:34px}
 @media(max-width:860px){.phases{grid-template-columns:1fr}}
-.ph{background:var(--surface);border:1px solid var(--hair);border-radius:16px;padding:20px 22px 22px}
-.ph .bar{height:5px;border-radius:99px;margin-bottom:15px}
-.ph.p1 .bar{background:var(--lime);width:18%}
-.ph.p2 .bar{background:var(--arti);width:62%}
+.ph{background:var(--surface);border:1px solid var(--hair);border-radius:16px;padding:19px 21px 21px}
+.ph .bar{height:5px;border-radius:99px;margin-bottom:14px}
+.ph.p1 .bar{background:var(--lime);width:16%}
+.ph.p2 .bar{background:var(--arti);width:60%}
 .ph.p3 .bar{background:var(--kombu);width:100%}
 .ph .w{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--ink-faint);text-transform:uppercase}
-.ph h3{font-size:19px;font-weight:750;letter-spacing:-.02em;margin-top:7px}
-.ph p{font-size:13px;color:var(--ink-mute);margin-top:8px;line-height:1.62}
-.ph .st{margin-top:13px;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--moss)}
+.ph h3{font-size:19px;font-weight:750;letter-spacing:-.02em;margin-top:6px}
+.ph p{font-size:12.8px;color:var(--ink-mute);margin-top:7px;line-height:1.6}
+.ph .st{margin-top:12px;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--moss)}
 .ph.p3 .st{color:var(--amber)}
 
 .note{
-  margin-top:24px;padding:15px 20px;border-radius:13px;
+  margin-top:20px;padding:14px 19px;border-radius:13px;
   background:var(--surface-2);border:1px solid var(--hair);
-  font-size:13.5px;color:var(--ink-2);line-height:1.68;
+  font-size:13px;color:var(--ink-2);line-height:1.68;
 }
 .note b{color:var(--ink)}
+.note.warn{background:rgba(154,108,8,.07);border-color:rgba(154,108,8,.22)}
+.notes2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+@media(max-width:860px){.notes2{grid-template-columns:1fr}}
+.notes2 .note{margin-top:0;height:100%}
 
-/* 投影仪常见的 1280x720 比 16:9 笔电矮一截，
-   两张表格页会顶出去。按视口高度收紧一档，不动宽屏。 */
+/* 投影機常見的 1280x720 比 16:9 筆電矮一截，按視口高度收緊一檔 */
 @media(max-height:800px){
-  .slide{padding:clamp(34px,4.5vh,56px) var(--pad) clamp(62px,8vh,80px)}
-  .tbl{margin-top:16px}
-  .tbl th{padding-bottom:8px}
-  .tbl td{padding:8px 12px;font-size:13px}
-  .tbl td.d{font-size:12px}
-  .tbl tfoot td{padding-top:10px;font-size:14px}
-  .tbl tfoot td.w{font-size:16px}
-  .note{margin-top:14px;padding:11px 17px;font-size:12.5px}
-  .phases{margin-top:24px;gap:13px}
-  .ph{padding:16px 18px 18px}
-  .ph p{margin-top:6px}
-  .vs2{margin-top:22px}
-  .side{padding:18px 20px 20px}
-  /* 总表二在这个高度还差 20px，再收一档 */
-  .tbl.tight td{padding:6px 10px;font-size:12.5px}
-  .tbl.tight td.d{font-size:11.5px}
-  .tbl.tight tfoot td{padding-top:9px}
-  .tbl.tight + .note{margin-top:12px;padding:10px 16px;font-size:12px}
+  .slide{padding:clamp(30px,4vh,52px) var(--pad) clamp(60px,7.5vh,78px)}
+  .tbl{margin-top:14px}
+  .tbl th{padding-bottom:7px}
+  .tbl td{padding:7px 12px;font-size:12.8px}
+  .tbl td.d{font-size:11.8px}
+  .tbl tfoot td{padding-top:9px;font-size:13.5px}
+  .tbl tfoot td.w{font-size:15.5px}
+  .tbl.tight td{padding:5.5px 10px;font-size:12.2px}
+  .tbl.tight td.d{font-size:11.2px}
+  .note{margin-top:13px;padding:10px 16px;font-size:12px}
+  .notes2{margin-top:13px;gap:11px}
+  .phases{margin-top:22px;gap:13px}
+  .ph{padding:15px 17px 17px}
+  .vs2{margin-top:20px}
+  .side{padding:17px 19px 19px}
+  .ai-list{margin-top:16px;gap:9px}
+  .ai-item{padding:12px 17px 13px}
+  .ai-item .eg{margin-top:6px;padding:7px 12px;font-size:12px}
+  .map{margin-top:16px;gap:12px}
+  .mcol{padding:14px 16px 16px}
+  .mcol li{padding:5.5px 0;font-size:12.8px}
+  .done-row{margin-top:15px;padding:10px 16px}
 }
 
-/* ---------- 导航 ---------- */
+/* ---------- 導航 ---------- */
 .hud{
   position:fixed;left:0;right:0;bottom:0;z-index:20;
   display:flex;align-items:center;gap:16px;padding:14px var(--pad) 16px;
   background:linear-gradient(180deg,rgba(234,232,224,0),rgba(234,232,224,.88) 42%);
 }
-.pips{display:flex;gap:6px;flex:1;flex-wrap:wrap}
-.pip{width:24px;height:4px;border-radius:99px;background:rgba(23,21,14,.13);border:0;padding:0;cursor:pointer;
+.pips{display:flex;gap:5px;flex:1;flex-wrap:wrap}
+.pip{width:22px;height:4px;border-radius:99px;background:rgba(23,21,14,.13);border:0;padding:0;cursor:pointer;
   transition:background .3s var(--fade),transform .3s var(--spring)}
 .pip:hover{background:rgba(23,21,14,.28);transform:scaleY(1.6)}
 .pip.on{background:var(--moss)}
@@ -214,7 +258,6 @@ strong{font-weight:750;color:var(--ink)}
   animation:fadeOut .6s var(--fade) 5s both;
 }
 @keyframes fadeOut{to{opacity:0;visibility:hidden}}
-
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.001ms !important;transition-duration:.001ms !important}
 }
@@ -226,41 +269,41 @@ strong{font-weight:750;color:var(--ink)}
     <rect width="100%" height="100%" filter="url(#gr)"/>
   </svg>
 </div>
-<div class="hint">← → 翻页</div>
+<div class="hint">← → 翻頁</div>
 
 <div class="deck" id="deck">
 
 <!-- 1 封面 -->
 <section class="slide">
   <div class="wrap">
-    <div class="eyebrow fx" style="--d:0ms">SEDNA CARE 院舍照护管理</div>
-    <h1 class="fx" style="--d:60ms;margin-top:18px">项目工期说明</h1>
-    <p class="lead fx" style="--d:160ms">分三段。第一段现在就能用，第二段让全院的人都能用，第三段可加可不加。<br>每一段都写清楚加了什么、举一个例子、需要多久。</p>
+    <div class="eyebrow fx" style="--d:0ms">SEDNA CARE 院舍照護管理</div>
+    <h1 class="fx" style="--d:60ms;margin-top:16px">專案工期說明</h1>
+    <p class="lead fx" style="--d:150ms">分三段。第一段現在就能用，第二段讓全院的人都能用，第三段可加可不加。<br>每一段都寫清楚加了什麼、舉一個例子、需要多久。</p>
     <div class="phases">
-      <div class="ph p1 fx" style="--d:260ms">
+      <div class="ph p1 fx" style="--d:250ms">
         <div class="bar"></div>
         <div class="w">短期</div>
-        <h3>一个人能用</h3>
-        <p>装在一台电脑上就能跑。基础功能齐，前端没有已知问题。</p>
-        <div class="st">1 到 2 周 · 已完成</div>
+        <h3>一個人能用</h3>
+        <p>裝在一台電腦上就能跑。基礎功能齊，前端沒有已知問題。</p>
+        <div class="st">1 到 2 週 · 已完成</div>
       </div>
-      <div class="ph p2 fx" style="--d:340ms">
+      <div class="ph p2 fx" style="--d:330ms">
         <div class="bar"></div>
         <div class="w">中期</div>
         <h3>全院的人都能用</h3>
-        <p>多人同时用，权限分明，改了什么查得到，数据长大了也不卡。</p>
-        <div class="st">再加 11 周</div>
+        <p>多人同時用，權限分明，改了什麼查得到，資料長大了也不卡。</p>
+        <div class="st">再加 8 到 11 週</div>
       </div>
-      <div class="ph p3 fx" style="--d:420ms">
+      <div class="ph p3 fx" style="--d:410ms">
         <div class="bar"></div>
-        <div class="w">长期</div>
+        <div class="w">長期</div>
         <h3>可加可不加</h3>
-        <p>排班、AI 助手、多院舍扩展。您不想加，中期那一版照样能用下去。</p>
-        <div class="st">再加 8 周 · 可选</div>
+        <p>排班、多院舍，再加八項 AI 選配。您一項都不選，中期那一版照樣用得下去。</p>
+        <div class="st">4 到 7.5 週 + AI 選配</div>
       </div>
     </div>
-    <div class="note fx" style="--d:520ms">
-      <b>工期口径：</b>一位开发全职投入，配合 Claude 辅助编码，按工作日计。以下都是估算区间，不是承诺日期。会随实际业务规则的确认时间浮动。
+    <div class="note fx" style="--d:510ms">
+      <b>工期口徑：</b>一位開發全職投入，配合 Claude 輔助編碼，按工作日計，不含假期與貴司內部審批的等待時間。每項都給「緊湊」與「穩妥」兩個數，<b>這是估算區間，不是承諾日期</b>。
     </div>
   </div>
 </section>
@@ -270,58 +313,56 @@ strong{font-weight:750;color:var(--ink)}
   <div class="wrap">
     <div class="fhead">
       <div class="l">
-        <div class="eyebrow fx" style="--d:0ms">短期 · 现在就能用</div>
-        <h2 class="fx" style="--d:60ms;margin-top:16px">一台电脑装好就能跑</h2>
-        <p class="sub fx" style="--d:120ms">下面这些不是计划，是已经做完并且可以当场打开来点的。</p>
+        <div class="eyebrow fx" style="--d:0ms">短期 · 現在就能用</div>
+        <h2 class="fx" style="--d:60ms;margin-top:14px">一台電腦裝好就能跑</h2>
+        <p class="sub fx" style="--d:110ms">下面這些不是計劃，是已經做完並且可以當場打開來點的。</p>
       </div>
-      <div class="cost fx" style="--d:160ms">
-        <span class="who">单人开发 + Claude</span>
-        <b class="num">1–2</b><span class="u">周</span>
-      </div>
+      <div class="cost fx" style="--d:150ms"><span class="who">單人開發 + Claude</span><b class="num">1–2</b><span class="u">週</span></div>
     </div>
-    <table class="tbl fx" style="--d:240ms">
-      <thead><tr><th style="width:26%">功能</th><th>说明</th><th class="r" style="width:14%">状态</th></tr></thead>
+    <table class="tbl fx" style="--d:230ms">
+      <thead><tr><th style="width:25%">功能</th><th>說明</th><th class="r" style="width:13%">狀態</th></tr></thead>
       <tbody>
-        <tr><td class="k">登入与三种角色</td><td class="d">职员、组长、管理员，同一个页面看到的数据不一样</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
-        <tr><td class="k">住客主档</td><td class="d">名单、床号、资助类别、服务轨道、上次评估日期</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
-        <tr><td class="k">Excel 批量导入</td><td class="d">格式不对的那几行会告诉您第几行为什么没进去，不是整批失败</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
-        <tr><td class="k">合规看板</td><td class="d">资助目标达成率、180 天评估到期追踪、做完但没填表</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
-        <tr><td class="k">操作留痕</td><td class="d">谁、什么时候、改前是什么、改后是什么</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
-        <tr><td class="k">规范问答</td><td class="d">问一句答一句，每句标注引自哪份文件的哪一节</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
-        <tr><td class="k">本地部署</td><td class="d">装在一台电脑上就能跑，不需要服务器，断网也能演示</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
-        <tr><td class="k">前端稳定性</td><td class="d">三种角色乘九个页面全部实测，没有已知问题</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
+        <tr><td class="k">登入與三種角色</td><td class="d">職員、組長、管理員，同一個頁面看到的資料不一樣</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
+        <tr><td class="k">住客主檔</td><td class="d">名單、床號、資助類別、服務軌道、上次評估日期</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
+        <tr><td class="k">Excel 批次匯入</td><td class="d">格式不對的那幾列會告訴您第幾列為什麼沒進去，不是整批失敗</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
+        <tr><td class="k">合規看板</td><td class="d">資助目標達成率、180 天評估到期追蹤、做完但沒填表</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
+        <tr><td class="k">操作留痕</td><td class="d">誰、什麼時候、改前是什麼、改後是什麼</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
+        <tr><td class="k">規範問答</td><td class="d">問一句答一句，每句標註引自哪份文件的哪一節</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
+        <tr><td class="k">本機部署</td><td class="d">裝在一台電腦上就能跑，不需要伺服器，斷網也能演示</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
+        <tr><td class="k">前端穩定性</td><td class="d">三種角色乘九個頁面全部實測，沒有已知問題</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
       </tbody>
     </table>
-    <div class="note fx" style="--d:400ms">
-      这一版适合<b>一个人用</b>。给一位主管自己看数据、自己导名单、自己查规范，完全够用。<br>
-      再往上走，问题不在功能多不多，而在<b>人多起来之后会出什么事</b>。下面一页一件。
+    <div class="note fx" style="--d:390ms">
+      這一版適合<b>一個人用</b>。給一位主管自己看資料、自己匯名單、自己查規範，完全夠用。<br>
+      再往上走，問題不在功能多不多，而在<b>人多起來之後會出什麼事</b>。下面一頁一件。
     </div>
   </div>
 </section>
 
-<!-- 3 账号与权限 -->
+<!-- 3 帳號與權限 -->
 <section class="slide">
   <div class="wrap">
     <div class="fhead">
       <div class="l">
-        <div class="eyebrow fx" style="--d:0ms">中期 · 让全院都能用</div>
-        <h2 class="fx" style="--d:60ms;margin-top:16px">账号与权限</h2>
-        <p class="sub fx" style="--d:110ms">每个人一个账号，各自只看得到自己该看的。</p>
+        <div class="eyebrow fx" style="--d:0ms">中期 · 讓全院都能用</div>
+        <h2 class="fx" style="--d:60ms;margin-top:14px">帳號與權限</h2>
+        <p class="sub fx" style="--d:110ms">每個人一個帳號，各自只看得到自己該看的。</p>
       </div>
-      <div class="cost fx" style="--d:150ms"><span class="who">单人开发 + Claude</span><b class="num">2</b><span class="u">周</span></div>
+      <div class="cost fx" style="--d:150ms"><span class="who">單人開發 + Claude</span><b class="num">1.5–2</b><span class="u">週</span></div>
     </div>
     <div class="vs2">
       <div class="side bad fx" style="--d:220ms">
-        <div class="st"><span class="dot"></span>没有它</div>
-        <p>全院共用一个账号密码。陈姑娘打开系统，看得到三间院舍全部 92 位住客的健康资料和评估记录。</p>
-        <p>有人离职，密码要全院一起改一次，改完还要通知每个人。</p>
+        <div class="st"><span class="dot"></span>沒有它</div>
+        <p>全院共用一個帳號密碼。陳姑娘打開系統，看得到三間院舍全部 92 位住客的健康資料和評估紀錄。</p>
+        <p>有人離職，密碼要全院一起改一次，改完還要通知每個人。</p>
       </div>
       <div class="side ok fx" style="--d:300ms">
-        <div class="st"><span class="dot"></span>加上之后</div>
-        <p>陈姑娘登入，只看到自己负责的 12 位住客。黄组长看本院舍 30 位。吴主任看全部 92 位。</p>
-        <p>有人离职，停掉他一个账号就行，其他人不受影响。</p>
+        <div class="st"><span class="dot"></span>加上之後</div>
+        <p>陳姑娘登入，只看到自己負責的 12 位住客。黃組長看本院舍 30 位。吳主任看全部 92 位。</p>
+        <p>有人離職，停掉他一個帳號就行，其他人不受影響。</p>
       </div>
     </div>
+    <div class="note fx" style="--d:380ms"><b>緊湊 1.5 週的做法：</b>員工管理只做新增、修改、停用，不做批次匯入與組織架構。</div>
   </div>
 </section>
 
@@ -330,233 +371,362 @@ strong{font-weight:750;color:var(--ink)}
   <div class="wrap">
     <div class="fhead">
       <div class="l">
-        <div class="eyebrow fx" style="--d:0ms">中期 · 让全院都能用</div>
-        <h2 class="fx" style="--d:60ms;margin-top:16px">操作留痕</h2>
-        <p class="sub fx" style="--d:110ms">谁在什么时候改了什么，一条都删不掉。</p>
+        <div class="eyebrow fx" style="--d:0ms">中期 · 讓全院都能用</div>
+        <h2 class="fx" style="--d:60ms;margin-top:14px">操作留痕</h2>
+        <p class="sub fx" style="--d:110ms">誰在什麼時候改了什麼，一條都刪不掉。</p>
       </div>
-      <div class="cost fx" style="--d:150ms"><span class="who">单人开发 + Claude</span><b class="num">1.5</b><span class="u">周</span></div>
+      <div class="cost fx" style="--d:150ms"><span class="who">單人開發 + Claude</span><b class="num">1–1.5</b><span class="u">週</span></div>
     </div>
     <div class="vs2">
       <div class="side bad fx" style="--d:220ms">
-        <div class="st"><span class="dot"></span>没有它</div>
-        <p>社署来查，问「这份评估记录是谁在什么时候改的」，答不出来。</p>
-        <p>纸本涂改还看得到痕迹。系统改过什么一点痕迹都没有，在监管和投诉面前反而比纸更弱。</p>
+        <div class="st"><span class="dot"></span>沒有它</div>
+        <p>社署來查，問「這份評估紀錄是誰在什麼時候改的」，答不出來。</p>
+        <p>紙本塗改還看得到痕跡。系統改過什麼一點痕跡都沒有，在監管和投訴面前反而比紙更弱。</p>
       </div>
       <div class="side ok fx" style="--d:300ms">
-        <div class="st"><span class="dot"></span>加上之后</div>
-        <p>每一次修改都记着谁、什么时候、原本是什么、改成什么。只能往上加，任何人都删不掉。</p>
-        <p>页面上显示的是一句中文，不是一堆代码，管理层和稽查直接能读。</p>
+        <div class="st"><span class="dot"></span>加上之後</div>
+        <p>每一次修改都記著誰、什麼時候、原本是什麼、改成什麼。只能往上加，任何人都刪不掉。</p>
+        <p>頁面上顯示的是一句中文，不是一堆代碼，管理層和稽查直接能讀。</p>
       </div>
     </div>
+    <div class="note fx" style="--d:380ms"><b>緊湊 1 週的做法：</b>先覆蓋所有寫入點與基本篩選，匯出與保留策略放到後面。</div>
   </div>
 </section>
 
-<!-- 5 性能 -->
+<!-- 5 效能 -->
 <section class="slide">
   <div class="wrap">
     <div class="fhead">
       <div class="l">
-        <div class="eyebrow fx" style="--d:0ms">中期 · 让全院都能用</div>
-        <h2 class="fx" style="--d:60ms;margin-top:16px">数据长大了还要快</h2>
-        <p class="sub fx" style="--d:110ms">用三年之后的数据量压一遍，把慢的地方提前找出来。</p>
+        <div class="eyebrow fx" style="--d:0ms">中期 · 讓全院都能用</div>
+        <h2 class="fx" style="--d:60ms;margin-top:14px">資料長大了還要快</h2>
+        <p class="sub fx" style="--d:110ms">用三年之後的資料量壓一遍，把慢的地方提前找出來。</p>
       </div>
-      <div class="cost fx" style="--d:150ms"><span class="who">单人开发 + Claude</span><b class="num">1</b><span class="u">周</span></div>
+      <div class="cost fx" style="--d:150ms"><span class="who">單人開發 + Claude</span><b class="num">1</b><span class="u">週</span></div>
     </div>
     <div class="vs2">
       <div class="side bad fx" style="--d:220ms">
-        <div class="st"><span class="dot"></span>没有它</div>
-        <p>合规看板上「做完但没填表」这一页，现在打开是 <b>0.19 秒</b>。三间院舍跑三年之后，同一页要 <b>18.7 秒</b>。</p>
-        <p>同事会以为系统坏了，会按刷新，会打电话给您。而这个问题在今天的演示里根本看不出来。</p>
+        <div class="st"><span class="dot"></span>沒有它</div>
+        <p>合規看板上「做完但沒填表」這一頁，現在打開是 <b>0.19 秒</b>。三間院舍跑三年之後，同一頁要 <b>18.7 秒</b>。</p>
+        <p>同事會以為系統壞了，會按重新整理，會打電話給您。而這個問題在今天的演示裡根本看不出來。</p>
       </div>
       <div class="side ok fx" style="--d:300ms">
-        <div class="st"><span class="dot"></span>加上之后</div>
-        <p>把数据放大到三年的量，一页一页测过去。上面那一页找出来之后补一行设定，变成 <b>0.065 秒</b>。</p>
-        <p>写那一行只要五秒钟。花时间的是知道该写哪一行，那只能靠一个一个量。</p>
+        <div class="st"><span class="dot"></span>加上之後</div>
+        <p>把資料放大到三年的量，一頁一頁測過去。上面那一頁找出來之後補一行設定，變成 <b>0.065 秒</b>。</p>
+        <p>寫那一行只要五秒鐘。花時間的是知道該寫哪一行，那只能靠一個一個量。</p>
       </div>
     </div>
+    <div class="note fx" style="--d:380ms">這一週<b>不給區間</b>。上面的數字是實際跑了一遍縮小版量出來的，不是估的，給區間反而不誠實。</div>
   </div>
 </section>
 
-<!-- 6 每日流程 -->
+<!-- 6 每日流程（工作量拆解） -->
 <section class="slide">
   <div class="wrap">
     <div class="fhead">
       <div class="l">
-        <div class="eyebrow fx" style="--d:0ms">中期 · 让全院都能用</div>
-        <h2 class="fx" style="--d:60ms;margin-top:16px">每日流程搬进系统</h2>
-        <p class="sub fx" style="--d:110ms">创建工作计划、开工接更、收工交更、表单填写与审批。</p>
+        <div class="eyebrow fx" style="--d:0ms">中期 · 讓全院都能用</div>
+        <h2 class="fx" style="--d:60ms;margin-top:14px">每日流程搬進系統</h2>
+        <p class="sub fx" style="--d:110ms">這是六項裡最花時間的一項，所以逐條列出來，您可以直接看要砍哪一條。</p>
       </div>
-      <div class="cost fx" style="--d:150ms"><span class="who">单人开发 + Claude</span><b class="num">5</b><span class="u">周</span></div>
+      <div class="cost fx" style="--d:150ms"><span class="who">單人開發 + Claude</span><b class="num">3.5–5</b><span class="u">週</span></div>
     </div>
-    <div class="vs2">
-      <div class="side bad fx" style="--d:220ms">
-        <div class="st"><span class="dot"></span>没有它</div>
-        <p>早班做完的事，晚班要靠口头交接或者翻纸本。谁跟进到哪一步，换了个人就断了。</p>
-        <p>做完却没填表的节次，往往要到月底对账才发现，那时候当事人已经想不起细节。</p>
-      </div>
-      <div class="side ok fx" style="--d:300ms">
-        <div class="st"><span class="dot"></span>加上之后</div>
-        <p>开工接更就看到上一更留下了什么，收工交更自动整理成摘要交给下一更。</p>
-        <p>做完没填表的当天就提醒，主管在自己那一页看得到还差几笔。</p>
-      </div>
-    </div>
-    <div class="note fx" style="--d:400ms">这一块是六项里最花时间的，因为演示版几乎没有做。它也是前线同事每天真正会碰的部分，做不好系统就没人用。</div>
-  </div>
-</section>
-
-<!-- 7 备份与恢复 -->
-<section class="slide">
-  <div class="wrap">
-    <div class="fhead">
-      <div class="l">
-        <div class="eyebrow fx" style="--d:0ms">中期 · 让全院都能用</div>
-        <h2 class="fx" style="--d:60ms;margin-top:16px">备份与恢复</h2>
-        <p class="sub fx" style="--d:110ms">每天自动备份，并且真的演练一次恢复。</p>
-      </div>
-      <div class="cost fx" style="--d:150ms"><span class="who">单人开发 + Claude</span><b class="num">1.5</b><span class="u">周</span></div>
-    </div>
-    <div class="vs2">
-      <div class="side bad fx" style="--d:220ms">
-        <div class="st"><span class="dot"></span>没有它</div>
-        <p>服务器硬盘坏掉，或者有人误删了一批记录，找不回来。</p>
-        <p>住客的照护记录、评估报告、事故报告，法规要求自离院起保存不少于七年。丢了没有补救办法。</p>
-      </div>
-      <div class="side ok fx" style="--d:300ms">
-        <div class="st"><span class="dot"></span>加上之后</div>
-        <p>每天自动备份，异地存一份。更重要的是<b>真的演练一次恢复</b>，确认备份能还原。</p>
-        <p>没有演练过的备份不算备份。很多单位是出事那天才发现备份是坏的。</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 8 排班 -->
-<section class="slide">
-  <div class="wrap">
-    <div class="fhead">
-      <div class="l">
-        <div class="eyebrow late fx" style="--d:0ms">长期 · 可加可不加</div>
-        <h2 class="fx" style="--d:60ms;margin-top:16px">排班与冲突检测</h2>
-        <p class="sub fx" style="--d:110ms">人来排，系统来挡错。第一版不做全自动优化。</p>
-      </div>
-      <div class="cost opt fx" style="--d:150ms"><span class="who">单人开发 + Claude</span><b class="num">4</b><span class="u">周</span></div>
-    </div>
-    <div class="vs2">
-      <div class="side bad fx" style="--d:220ms">
-        <div class="st"><span class="dot"></span>没有它</div>
-        <p>排班还是在 Excel 里做。治疗师的资质对不对、连续工时有没有超、场地撞没撞、临时缺席谁来补，全靠人脑记。</p>
-        <p>排错一格，可能要到当天早上才发现。</p>
-      </div>
-      <div class="side ok fx" style="--d:300ms">
-        <div class="st"><span class="dot"></span>加上之后</div>
-        <p>还是人来排，但排的时候系统当场标红：资质不符、工时超标、场地冲突、频次不足。</p>
-        <p>全自动优化排在这之后。要先把贵司的排班规则一条一条问出来，问错一条整张表作废。</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 9 AI -->
-<section class="slide">
-  <div class="wrap">
-    <div class="fhead">
-      <div class="l">
-        <div class="eyebrow late fx" style="--d:0ms">长期 · 可加可不加</div>
-        <h2 class="fx" style="--d:60ms;margin-top:16px">AI 规范问答</h2>
-        <p class="sub fx" style="--d:110ms">问一句答一句，每句都能追回原文。</p>
-      </div>
-      <div class="cost opt fx" style="--d:150ms"><span class="who">单人开发 + Claude</span><b class="num">2.5</b><span class="u">周</span></div>
-    </div>
-    <div class="vs2">
-      <div class="side bad fx" style="--d:220ms">
-        <div class="st"><span class="dot"></span>没有它</div>
-        <p>新同事问「住客跌倒之后怎么处理」，要翻一本厚的作业指引，或者去问主管。主管不在就先凭印象做。</p>
-        <p>凭印象做的那一次，正好就是稽查会问到的那一次。</p>
-      </div>
-      <div class="side ok fx" style="--d:300ms">
-        <div class="st"><span class="dot"></span>加上之后</div>
-        <p>直接问，系统给答案，每一句后面标着引自哪份文件的哪一节，点开就是原文。</p>
-        <p>库里没有依据时明确回答找不到，不瞎编。受监管的场景里，答错比答不出来严重得多。</p>
-      </div>
-    </div>
-    <div class="note fx" style="--d:400ms">这一项演示版已经跑通了，所以只要 2.5 周。另外三个方向（管理层问数、交更摘要、复康月度报告）不在这个数里，其中两个还需要三到六个月的历史数据才有内容可写。</div>
-  </div>
-</section>
-
-<!-- 10 多院舍与合规 -->
-<section class="slide">
-  <div class="wrap">
-    <div class="fhead">
-      <div class="l">
-        <div class="eyebrow late fx" style="--d:0ms">长期 · 可加可不加</div>
-        <h2 class="fx" style="--d:60ms;margin-top:16px">多院舍与资料合规</h2>
-        <p class="sub fx" style="--d:110ms">一套系统管三间，院舍之间互相看不到。</p>
-      </div>
-      <div class="cost opt fx" style="--d:150ms"><span class="who">单人开发 + Claude</span><b class="num">1.5</b><span class="u">周</span></div>
-    </div>
-    <div class="vs2">
-      <div class="side bad fx" style="--d:220ms">
-        <div class="st"><span class="dot"></span>没有它</div>
-        <p>三间院舍各做各的，数据对不起来，管理层想看全局要人工汇总。</p>
-        <p>公司主体在香港，住客健康资料受个人资料私隐条例规管，开发在深圳。资料落在哪一侧没定，架构做完再改等于推倒重来。</p>
-      </div>
-      <div class="side ok fx" style="--d:300ms">
-        <div class="st"><span class="dot"></span>加上之后</div>
-        <p>一套系统管三间，院舍之间的资料互相看不到，管理层一个页面看全局。</p>
-        <p>资料落地方案在动工之前确认，这一条要法务点头，不是技术能自己定的。</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 11 总表一 -->
-<section class="slide">
-  <div class="wrap">
-    <div class="eyebrow fx" style="--d:0ms">总表一</div>
-    <h2 class="fx" style="--d:60ms;margin-top:16px">短期已经实现的</h2>
-    <p class="sub fx" style="--d:110ms">这一栏是现在就能打开来点的东西，不需要再等。</p>
-    <table class="tbl fx" style="--d:200ms">
-      <thead><tr><th style="width:30%">功能</th><th>够谁用</th><th class="r" style="width:16%">状态</th></tr></thead>
+    <table class="tbl tight fx" style="--d:220ms">
+      <thead><tr><th style="width:20%">要做的東西</th><th>它在解決什麼</th><th class="r" style="width:11%">工作日</th></tr></thead>
       <tbody>
-        <tr><td class="k">登入与三种角色</td><td class="d">一位主管自己用，或者两三个人分工用</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
-        <tr><td class="k">住客主档与 Excel 导入</td><td class="d">把纸本名单一次性搬进系统</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
-        <tr><td class="k">合规看板</td><td class="d">自己查资助目标、评估到期、缺表</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
-        <tr><td class="k">操作留痕</td><td class="d">自己留个底，知道改过什么</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
-        <tr><td class="k">规范问答</td><td class="d">自己查规范，不用翻纸本</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
-        <tr><td class="k">本地部署</td><td class="d">一台电脑，断网也能用</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
+        <tr><td class="k">建立工作計劃</td><td class="d">一次排出一週的節次，日曆上看得到誰在哪個時段帶哪位住客</td><td class="r w">4</td></tr>
+        <tr><td class="k">接收與拒絕節次</td><td class="d">治療師收到指派可以接受或拒絕，拒絕要填原因，主管看得到</td><td class="r w">2</td></tr>
+        <tr><td class="k">服務表單填寫</td><td class="d">欄位由範本決定。範本改版之後，舊紀錄仍按當時的版本顯示</td><td class="r w">4</td></tr>
+        <tr><td class="k">審批與鎖定</td><td class="d">提交、主管覆核、鎖定不可改。不合格可以退回重填</td><td class="r w">3</td></tr>
+        <tr><td class="k">開工接更</td><td class="d">上一更沒做完的事自動帶過來，接更的人逐條簽收</td><td class="r w">3</td></tr>
+        <tr><td class="k">收工交更</td><td class="d">把這一更做了什麼、有什麼異常整理成摘要，交給下一更</td><td class="r w">3</td></tr>
+        <tr><td class="k">待跟進事項</td><td class="d">跨更的待辦。誰負責、什麼時候到期、做完了沒有</td><td class="r w">2</td></tr>
+        <tr><td class="k">通知</td><td class="d">有人指派給你、有表單被退回、有事項快到期</td><td class="r w">2</td></tr>
+        <tr><td class="k">聯調與返工</td><td class="d">前線試用之後一定要改，這兩天是預留的</td><td class="r w">2</td></tr>
       </tbody>
-      <tfoot><tr><td class="k">合计</td><td class="d">适合一个人或极少数人使用</td><td class="r w">1–2 周</td></tr></tfoot>
+      <tfoot><tr><td class="k">合計</td><td class="d">穩妥值</td><td class="r w">25 天 ≈ 5 週</td></tr></tfoot>
     </table>
-    <div class="note fx" style="--d:360ms">这一版<b>已经交付</b>。您现在可以自己打开来点，不需要等任何东西。</div>
+    <div class="notes2 fx" style="--d:400ms">
+      <div class="note"><b>為什麼壓不到更短：</b>這 5 週裡大約 3 週在寫程式，2 週在跟前線對齊和返工。表單要填哪些欄位、交更要交接什麼、誰批誰的表，這三件事我猜不出來，要問完再改。</div>
+      <div class="note warn"><b>壓到 3.5 週要砍三樣：</b>通知（先用現有的 WhatsApp 群）、待跟進事項（併進交更摘要的自由文字）、表單範本編輯器（第一版只做一種服務紀錄表）。</div>
+    </div>
   </div>
 </section>
 
-<!-- 12 总表二 -->
+<!-- 7 備份與復原 -->
 <section class="slide">
   <div class="wrap">
-    <div class="eyebrow fx" style="--d:0ms">总表二</div>
-    <h2 class="fx" style="--d:60ms;margin-top:14px">长期陆续要加的</h2>
-    <p class="sub fx" style="--d:100ms">中期五项做完，全院的人就能无障碍地用。长期三项是加分项，不加也不影响用。</p>
-    <table class="tbl tight fx" style="--d:180ms">
-      <thead><tr><th style="width:22%">功能</th><th style="width:13%">阶段</th><th>解决什么</th><th class="r" style="width:11%">周期</th></tr></thead>
+    <div class="fhead">
+      <div class="l">
+        <div class="eyebrow fx" style="--d:0ms">中期 · 讓全院都能用</div>
+        <h2 class="fx" style="--d:60ms;margin-top:14px">備份與復原</h2>
+        <p class="sub fx" style="--d:110ms">每天自動備份，並且真的演練一次還原。</p>
+      </div>
+      <div class="cost fx" style="--d:150ms"><span class="who">單人開發 + Claude</span><b class="num">1–1.5</b><span class="u">週</span></div>
+    </div>
+    <div class="vs2">
+      <div class="side bad fx" style="--d:220ms">
+        <div class="st"><span class="dot"></span>沒有它</div>
+        <p>伺服器硬碟壞掉，或者有人誤刪了一批紀錄，找不回來。</p>
+        <p>住客的照護紀錄、評估報告、事故報告，法規要求自離院起保存不少於七年。丟了沒有補救辦法。</p>
+      </div>
+      <div class="side ok fx" style="--d:300ms">
+        <div class="st"><span class="dot"></span>加上之後</div>
+        <p>每天自動備份，異地存一份。更重要的是<b>真的演練一次還原</b>，確認備份能救得回來。</p>
+        <p>沒有演練過的備份不算備份。很多單位是出事那天才發現備份是壞的。</p>
+      </div>
+    </div>
+    <div class="note fx" style="--d:380ms"><b>緊湊 1 週的做法：</b>還原演練只做一次，季度例行演練放到後面。<b>但那一次不能省。</b></div>
+  </div>
+</section>
+
+<!-- 8 AI 能力地圖 -->
+<section class="slide">
+  <div class="wrap">
+    <div class="fhead">
+      <div class="l">
+        <div class="eyebrow late fx" style="--d:0ms">選配 · 一項都不選也可以</div>
+        <h2 class="fx" style="--d:60ms;margin-top:14px">AI 能力地圖</h2>
+        <p class="sub fx" style="--d:110ms">八項可選，按價值分三組。這是菜單不是套餐，挑幾樣算幾樣。</p>
+      </div>
+      <div class="cost opt fx" style="--d:150ms"><span class="who">全部選滿</span><b class="num">12.5</b><span class="u">週</span></div>
+    </div>
+    <div class="done-row fx" style="--d:200ms">
+      <div class="t">已跑通 · 規範問答</div>
+      <div class="d">問一句答一句，每句標註引自哪份文件哪一節。這一項在演示版裡已經能用，不佔工期。</div>
+    </div>
+    <div class="map">
+      <div class="mcol fx" style="--d:260ms">
+        <div class="h">記錄自動化</div>
+        <div class="s">把前線每天花在打字上的時間拿回來</div>
+        <ul>
+          <li><i>語音轉表單</i><em>2 週</em></li>
+          <li><i>交更摘要生成</i><em>1 週</em></li>
+          <li><i>表單品質檢查</i><em>1 週</em></li>
+        </ul>
+        <div class="tot"><span>小計</span><em>4 週</em></div>
+      </div>
+      <div class="mcol fx" style="--d:330ms">
+        <div class="h">風險偵測與合規自查</div>
+        <div class="s">在社署來之前，自己先查一遍</div>
+        <ul>
+          <li><i>合規自查 Agent</i><em>2.5 週</em></li>
+          <li><i>異常與風險預警</i><em>1.5 週</em></li>
+        </ul>
+        <div class="tot"><span>小計</span><em>4 週</em></div>
+      </div>
+      <div class="mcol fx" style="--d:400ms">
+        <div class="h">決策支援與對外輸出</div>
+        <div class="s">管理層自己問，報告自己出</div>
+        <ul>
+          <li><i>管理層問數</i><em>2 週</em></li>
+          <li><i>月度復康報告</i><em>1.5 週</em></li>
+          <li><i>家屬月度簡報</i><em>1 週</em></li>
+        </ul>
+        <div class="tot"><span>小計</span><em>4.5 週</em></div>
+      </div>
+    </div>
+    <div class="note fx" style="--d:480ms">
+      <b>為什麼每項只要一兩週：</b>AI 功能真正的成本在資料地基，而地基這個專案已經打好了。系統裡已經有結構化的節次、表單、留痕與規範庫，這八項是接上去，不是從零建。
+    </div>
+  </div>
+</section>
+
+<!-- 9 記錄自動化 -->
+<section class="slide">
+  <div class="wrap">
+    <div class="fhead">
+      <div class="l">
+        <div class="eyebrow late fx" style="--d:0ms">AI 選配 · 第一組</div>
+        <h2 class="fx" style="--d:60ms;margin-top:14px">記錄自動化</h2>
+        <p class="sub fx" style="--d:110ms">前線每天花在打字上的時間，是最容易拿回來的一塊。</p>
+      </div>
+      <div class="cost opt fx" style="--d:150ms"><span class="who">三項合計</span><b class="num">4</b><span class="u">週</span></div>
+    </div>
+    <div class="ai-list">
+      <div class="ai-item fx" style="--d:220ms">
+        <div class="n">語音轉表單</div><div class="w">2 週</div>
+        <div class="p">治療師做完一節，對著手機說一句話，系統自動整理成表單欄位，人看一眼確認再提交。</div>
+        <div class="eg">說：「李伯今日步行訓練十五分鐘，中途需扶持，右膝有痛。」<br>系統填出：<b>完成度</b> 部分完成 · <b>時長</b> 15 分鐘 · <b>配合程度</b> 一般 · <b>備註</b> 需扶持，右膝疼痛。<br>這條入口在現在的演示版裡已經有，助理的第三個示例就是它。</div>
+      </div>
+      <div class="ai-item fx" style="--d:300ms">
+        <div class="n">交更摘要生成</div><div class="w">1 週</div>
+        <div class="p">收工時不用自己寫交更紙。系統把這一更的紀錄與異常整理成一段話，人改兩個字就能交出去。</div>
+        <div class="eg">自動生成：「今日 8 節，完成 6 節，未能出席 2 節（A012 馮雅琳身體不適、A007 蔡德輝家屬帶出）。<b>需跟進</b>：A003 何文傑連續兩次配合欠佳，建議明日調整方式。」</div>
+      </div>
+      <div class="ai-item fx" style="--d:380ms">
+        <div class="n">表單品質檢查</div><div class="w">1 週</div>
+        <div class="p">提交之前看一眼，太籠統、缺關鍵項、或者跟上一次幾乎一模一樣，當場提醒補充。</div>
+        <div class="eg">提醒：「這段記錄與該住客上週三的紀錄有 92% 相同，且未填寫本次的疼痛評分。稽查時最常被質疑的就是這一類。」</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 風險偵測與合規自查 -->
+<section class="slide">
+  <div class="wrap">
+    <div class="fhead">
+      <div class="l">
+        <div class="eyebrow late fx" style="--d:0ms">AI 選配 · 第二組</div>
+        <h2 class="fx" style="--d:60ms;margin-top:14px">風險偵測與合規自查</h2>
+        <p class="sub fx" style="--d:110ms">這一組是三組裡對管理層最值錢的。它做的事是在社署來之前，自己先查一遍。</p>
+      </div>
+      <div class="cost opt fx" style="--d:150ms"><span class="who">兩項合計</span><b class="num">4</b><span class="u">週</span></div>
+    </div>
+    <div class="ai-list">
+      <div class="ai-item fx" style="--d:220ms">
+        <div class="n">合規自查 Agent</div><div class="w">2.5 週</div>
+        <div class="p">每個月自動跑一遍：讀規範條文，查系統裡的實際紀錄，逐條比對，把不合規的地方列出來並附上證據。</div>
+        <div class="eg">月度自查報告：「<b>發現 3 項不符</b>。一、A015 許婉玲跌倒後第 18 天仍未重新評估，規範要求兩週內（作業指引 1.4）。二、B023 胡麗珍的評估已逾期 34 天（3.1）。三、上月有 12 節已完成但未填服務表單（4.1）。<b>已附每一條的原始紀錄連結。</b>」</div>
+      </div>
+      <div class="ai-item fx" style="--d:310ms">
+        <div class="n">異常與風險預警</div><div class="w">1.5 週</div>
+        <div class="p">夜間批次跑一遍全院資料，早上把值得注意的推給主管。不是等人去翻，是主動找出來。</div>
+        <div class="eg">今早提示：「A003 何文傑連續三次配合欠佳，可能需要調整復康方案。<br>B021 梁凱婷本週完成 1 / 5 節，按目前進度月底會低於資助要求。<br>A009 蔡偉明上週跌倒，兩週重評期限還剩 4 天。」</div>
+      </div>
+    </div>
+    <div class="note fx" style="--d:400ms">這一組的價值不在省時間，在<b>把「事後被抓」變成「事前自己發現」</b>。稽查的問題從「你為什麼漏了」變成「你已經知道並且在處理」。</div>
+  </div>
+</section>
+
+<!-- 11 決策支援與對外輸出 -->
+<section class="slide">
+  <div class="wrap">
+    <div class="fhead">
+      <div class="l">
+        <div class="eyebrow late fx" style="--d:0ms">AI 選配 · 第三組</div>
+        <h2 class="fx" style="--d:60ms;margin-top:14px">決策支援與對外輸出</h2>
+        <p class="sub fx" style="--d:110ms">管理層自己問數，對家屬與對上的報告自己生成。</p>
+      </div>
+      <div class="cost opt fx" style="--d:150ms"><span class="who">三項合計</span><b class="num">4.5</b><span class="u">週</span></div>
+    </div>
+    <div class="ai-list">
+      <div class="ai-item fx" style="--d:220ms">
+        <div class="n">管理層問數</div><div class="w">2 週</div>
+        <div class="p">用平常說話的方式問，系統查完直接答，不用先學會用報表工具。</div>
+        <div class="eg">問：「本月哪間院舍未能出席最多？」<br>答：「松栢園 47 節，佔該院舍總節次 11.2%，比上月升 2.8 個百分點。主要集中在週一上午。」</div>
+      </div>
+      <div class="ai-item fx" style="--d:300ms">
+        <div class="n">月度復康報告</div><div class="w">1.5 週</div>
+        <div class="p">把一位住客一個月的紀錄匯總成進展報告，人審核之後發布。需要三到六個月的歷史資料才有內容可寫。</div>
+        <div class="eg">「李國榮先生 8 月共完成 12 節步行訓練。本月起可在扶持下連續步行 15 公尺，較上月的 8 公尺有進步。右膝疼痛回報次數由 6 次降至 2 次。」</div>
+      </div>
+      <div class="ai-item fx" style="--d:380ms">
+        <div class="n">家屬月度簡報</div><div class="w">1 週</div>
+        <div class="p">同一份資料換一種寫法給家屬，避開專業術語，人審核之後發出。</div>
+        <div class="eg">「李伯本月精神不錯，走路比上個月穩了一些，膝蓋喊痛的次數也少了。下個月我們會慢慢增加訓練時間。」</div>
+      </div>
+    </div>
+    <div class="note warn fx" style="--d:450ms">
+      <b>一條必須先說明的界線：</b>問數走的是同一套權限，不會因為是 AI 就繞過去。組長問「其他院舍怎麼樣」，AI 一樣只答他自己院舍的數。這一條是設計進去的，不是靠提示詞叮囑它。
+    </div>
+  </div>
+</section>
+
+<!-- 12 排班 -->
+<section class="slide">
+  <div class="wrap">
+    <div class="fhead">
+      <div class="l">
+        <div class="eyebrow late fx" style="--d:0ms">長期 · 可加可不加</div>
+        <h2 class="fx" style="--d:60ms;margin-top:14px">排班與衝突檢測</h2>
+        <p class="sub fx" style="--d:110ms">人來排，系統來擋錯。第一版不做全自動最佳化。</p>
+      </div>
+      <div class="cost opt fx" style="--d:150ms"><span class="who">單人開發 + Claude</span><b class="num">3–6</b><span class="u">週</span></div>
+    </div>
+    <div class="vs2">
+      <div class="side bad fx" style="--d:220ms">
+        <div class="st"><span class="dot"></span>沒有它</div>
+        <p>排班還是在 Excel 裡做。治療師的資質對不對、連續工時有沒有超、場地撞沒撞、臨時缺席誰來補，全靠人腦記。</p>
+        <p>排錯一格，可能要到當天早上才發現。</p>
+      </div>
+      <div class="side ok fx" style="--d:300ms">
+        <div class="st"><span class="dot"></span>加上之後</div>
+        <p>還是人來排，但排的時候系統當場標紅：資質不符、工時超標、場地衝突、頻次不足。</p>
+        <p>全自動最佳化排在這之後。要先把貴司的排班規則一條一條問出來，問錯一條整張表作廢。</p>
+      </div>
+    </div>
+    <div class="note warn fx" style="--d:390ms"><b>這一項的區間最寬（3 到 6 週），原因寫在明處：</b>排班規則還沒訪談過。寬不是我保守，是這一塊我現在真的不知道。訪談完成之後，這個區間會立刻收窄。</div>
+  </div>
+</section>
+
+<!-- 13 多院舍與資料合規 -->
+<section class="slide">
+  <div class="wrap">
+    <div class="fhead">
+      <div class="l">
+        <div class="eyebrow late fx" style="--d:0ms">長期 · 可加可不加</div>
+        <h2 class="fx" style="--d:60ms;margin-top:14px">多院舍與資料合規</h2>
+        <p class="sub fx" style="--d:110ms">一套系統管三間，院舍之間互相看不到。</p>
+      </div>
+      <div class="cost opt fx" style="--d:150ms"><span class="who">單人開發 + Claude</span><b class="num">1–1.5</b><span class="u">週</span></div>
+    </div>
+    <div class="vs2">
+      <div class="side bad fx" style="--d:220ms">
+        <div class="st"><span class="dot"></span>沒有它</div>
+        <p>三間院舍各做各的，資料對不起來，管理層想看全局要人工彙總。</p>
+        <p>公司主體在香港，住客健康資料受個人資料私隱條例規管，開發在深圳。資料落在哪一側沒定，架構做完再改等於推倒重來。</p>
+      </div>
+      <div class="side ok fx" style="--d:300ms">
+        <div class="st"><span class="dot"></span>加上之後</div>
+        <p>一套系統管三間，院舍之間的資料互相看不到，管理層一個頁面看全局。</p>
+        <p>資料落地方案在動工之前確認，這一條要法務點頭，不是技術能自己定的。</p>
+      </div>
+    </div>
+    <div class="note fx" style="--d:390ms">這 1 到 1.5 週只算<b>開發</b>。另外兩間院舍的資料遷移與同事培訓，每間約兩週，那部分要先盤點才估得準。</div>
+  </div>
+</section>
+
+<!-- 14 總表一 -->
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow fx" style="--d:0ms">總表一</div>
+    <h2 class="fx" style="--d:60ms;margin-top:14px">短期已經實現的</h2>
+    <p class="sub fx" style="--d:110ms">這一欄是現在就能打開來點的東西，不需要再等。</p>
+    <table class="tbl fx" style="--d:190ms">
+      <thead><tr><th style="width:28%">功能</th><th>夠誰用</th><th class="r" style="width:15%">狀態</th></tr></thead>
       <tbody>
-        <tr><td class="k">账号与权限</td><td><span class="tag-mid">中期</span></td><td class="d">每人一个账号，各看各的范围</td><td class="r w">2 周</td></tr>
-        <tr><td class="k">操作留痕</td><td><span class="tag-mid">中期</span></td><td class="d">稽查问起来答得出</td><td class="r w">1.5 周</td></tr>
-        <tr><td class="k">性能与压测</td><td><span class="tag-mid">中期</span></td><td class="d">三年数据量下还是秒开</td><td class="r w">1 周</td></tr>
-        <tr><td class="k">每日流程</td><td><span class="tag-mid">中期</span></td><td class="d">接更交更、表单审批，前线真的会用</td><td class="r w">5 周</td></tr>
-        <tr><td class="k">备份与恢复</td><td><span class="tag-mid">中期</span></td><td class="d">丢不了，且演练过能还原</td><td class="r w">1.5 周</td></tr>
-        <tr><td class="k">排班与冲突检测</td><td><span class="tag-late">长期</span></td><td class="d">从 Excel 搬进来，系统帮忙挡错</td><td class="r w opt">4 周</td></tr>
-        <tr><td class="k">AI 规范问答</td><td><span class="tag-late">长期</span></td><td class="d">问一句答一句，带原文出处</td><td class="r w opt">2.5 周</td></tr>
-        <tr><td class="k">多院舍与合规</td><td><span class="tag-late">长期</span></td><td class="d">一套管三间，资料落地先确认</td><td class="r w opt">1.5 周</td></tr>
+        <tr><td class="k">登入與三種角色</td><td class="d">一位主管自己用，或者兩三個人分工用</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
+        <tr><td class="k">住客主檔與 Excel 匯入</td><td class="d">把紙本名單一次過搬進系統</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
+        <tr><td class="k">合規看板</td><td class="d">自己查資助目標、評估到期、缺表</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
+        <tr><td class="k">操作留痕</td><td class="d">自己留個底，知道改過什麼</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
+        <tr><td class="k">規範問答</td><td class="d">自己查規範，不用翻紙本</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
+        <tr><td class="k">本機部署</td><td class="d">一台電腦，斷網也能用</td><td class="r"><span class="ok-chip">已完成</span></td></tr>
+      </tbody>
+      <tfoot><tr><td class="k">合計</td><td class="d">適合一個人或極少數人使用</td><td class="r w">1–2 週</td></tr></tfoot>
+    </table>
+    <div class="note fx" style="--d:350ms">這一版<b>已經交付</b>。您現在可以自己打開來點，不需要等任何東西。</div>
+  </div>
+</section>
+
+<!-- 15 總表二 -->
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow fx" style="--d:0ms">總表二</div>
+    <h2 class="fx" style="--d:60ms;margin-top:12px">後續陸續要加的</h2>
+    <p class="sub fx" style="--d:100ms">中期五項做完，全院的人就能無障礙地用。後面全部是選配，不加也不影響用。</p>
+    <table class="tbl tight fx" style="--d:170ms">
+      <thead><tr><th style="width:21%">功能</th><th style="width:11%">階段</th><th>解決什麼</th><th class="r" style="width:12%">週期</th></tr></thead>
+      <tbody>
+        <tr><td class="k">帳號與權限</td><td><span class="tag-mid">中期</span></td><td class="d">每人一個帳號，各看各的範圍</td><td class="r w">1.5–2 週</td></tr>
+        <tr><td class="k">操作留痕</td><td><span class="tag-mid">中期</span></td><td class="d">稽查問起來答得出</td><td class="r w">1–1.5 週</td></tr>
+        <tr><td class="k">效能與壓測</td><td><span class="tag-mid">中期</span></td><td class="d">三年資料量下還是秒開</td><td class="r w">1 週</td></tr>
+        <tr><td class="k">每日流程</td><td><span class="tag-mid">中期</span></td><td class="d">接更交更、表單審批，前線真的會用</td><td class="r w">3.5–5 週</td></tr>
+        <tr><td class="k">備份與復原</td><td><span class="tag-mid">中期</span></td><td class="d">丟不了，且演練過救得回來</td><td class="r w">1–1.5 週</td></tr>
+        <tr><td class="k">排班與衝突檢測</td><td><span class="tag-late">長期</span></td><td class="d">從 Excel 搬進來，系統幫忙擋錯</td><td class="r w opt">3–6 週</td></tr>
+        <tr><td class="k">多院舍與合規</td><td><span class="tag-late">長期</span></td><td class="d">一套管三間，資料落地先確認</td><td class="r w opt">1–1.5 週</td></tr>
+        <tr><td class="k">AI 八項選配</td><td><span class="tag-late">菜單</span></td><td class="d">記錄自動化 4 週 · 風險偵測 4 週 · 決策支援 4.5 週</td><td class="r w opt">0–12.5 週</td></tr>
       </tbody>
       <tfoot>
-        <tr><td class="k">中期五项</td><td></td><td class="d">做完这一段，全院多人无障碍使用，权限分明</td><td class="r w">11 周</td></tr>
-        <tr><td class="k">长期三项</td><td></td><td class="d">可选。不加，中期那一版照样能长期用下去</td><td class="r w opt">8 周</td></tr>
+        <tr><td class="k">中期五項</td><td></td><td class="d">做完這一段，全院多人無障礙使用，權限分明</td><td class="r w">8–11 週</td></tr>
+        <tr><td class="k">長期兩項</td><td></td><td class="d">排班與多院舍。加上中期就是完整的系統</td><td class="r w opt">4–7.5 週</td></tr>
+        <tr><td class="k">AI 選配</td><td></td><td class="d">八項自由挑，一項不挑工期不變</td><td class="r w opt">0–12.5 週</td></tr>
       </tfoot>
     </table>
-    <div class="note fx" style="--d:380ms">
-      全部加完约 <b>19 周</b>，区间 17 到 22。这是估算不是承诺日期，会随排班规则访谈与资料合规确认的时间浮动。<br>
-      每四到六周交一次可以打开来点的版本，<b>每一个节点您都可以喊停</b>。
+    <div class="note fx" style="--d:350ms">
+      不算 AI，做到完整系統是 <b>12 到 18.5 週</b>。AI 是加在這個基線之上的選配，您一項都不選，工期還是這個數。<br>
+      每四到六週交一次可以打開來點的版本，<b>每一個節點您都可以喊停</b>。
     </div>
   </div>
 </section>
@@ -565,10 +735,10 @@ strong{font-weight:750;color:var(--ink)}
 
 <div class="hud">
   <div class="pips" id="pips"></div>
-  <div class="count" id="count">01 / 12</div>
+  <div class="count" id="count">01 / 15</div>
   <div class="arrows">
-    <button id="prev" aria-label="上一页">←</button>
-    <button id="next" aria-label="下一页">→</button>
+    <button id="prev" aria-label="上一頁">←</button>
+    <button id="next" aria-label="下一頁">→</button>
   </div>
 </div>
 
@@ -584,7 +754,7 @@ strong{font-weight:750;color:var(--ink)}
   slides.forEach(function(_,n){
     var b=document.createElement('button');
     b.className='pip';
-    b.setAttribute('aria-label','第 '+(n+1)+' 页');
+    b.setAttribute('aria-label','第 '+(n+1)+' 頁');
     b.addEventListener('click',function(){ go(n); });
     pips.appendChild(b);
   });
@@ -596,7 +766,7 @@ strong{font-weight:750;color:var(--ink)}
     slides[i].classList.remove('on');
     i=n;
     var el=slides[i];
-    void el.offsetWidth;             // 重排一次，入场动画才会重播
+    void el.offsetWidth;             // 重排一次，入場動畫才會重播
     el.classList.add('on');
     el.scrollTop=0;
     pipEls.forEach(function(p,x){ p.classList.toggle('on',x===i); });
