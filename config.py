@@ -38,10 +38,13 @@ SECRET = os.getenv("SEDNA_SECRET", "demo-only-secret-do-not-use-in-production")
 TOKEN_TTL_HOURS = 12
 
 # ---- 模型 -------------------------------------------------------------------
-# 任何 OpenAI 相容端点都可以：DashScope / DeepSeek / OpenAI / 本地 vLLM
-LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1")
+# 任何 OpenAI 相容端点都可以：DeepSeek / DashScope / OpenAI / 本地 vLLM
+# 预设指向 DeepSeek，换服务只要改 .env 里的三个值，程式码一行不动。
+LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://api.deepseek.com/v1")
+# 金钥只从环境变数或 .env 读，绝不写死在这里。
+# .env 在 .gitignore 里，硬编进来就等于推上 git，之后换金钥也救不回已推的那一版。
 LLM_API_KEY = os.getenv("LLM_API_KEY", "")
-LLM_MODEL = os.getenv("LLM_MODEL", "qwen-plus")
+LLM_MODEL = os.getenv("LLM_MODEL", "deepseek-chat")
 
 # 打开后知识库问答不发请求，直接走预置答案。现场没有网络时用。
 DEMO_MODE = os.getenv("SEDNA_DEMO_MODE", "").lower() in ("1", "true", "yes")
