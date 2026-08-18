@@ -92,6 +92,12 @@ CREATE TABLE IF NOT EXISTS form_submissions (
 );
 
 CREATE INDEX IF NOT EXISTS idx_submissions_resident ON form_submissions(resident_id);
+-- 合规看板的「已完成但未填表」是 NOT EXISTS (... WHERE x.session_id = s.id)。
+-- 没有这个索引的话，每一节都要全表扫一遍 form_submissions，成本随两张表相乘。
+-- 演示资料 3080 节时是 188ms，看不出问题；三间院舍跑三年是 15 万节，
+-- 同一句查询要 18.7 秒，页面直接白掉。加上之后 65ms，快 288 倍。
+-- 这类东西不会在演示里出现，只会在上线一年后出现。
+CREATE INDEX IF NOT EXISTS idx_submissions_session ON form_submissions(session_id);
 
 -- 只追加，没有更新和删除接口。
 -- summary 是写入时就生成好的一句中文，界面直接显示，不让使用者读 JSON。
