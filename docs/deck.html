@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>能跑与能扛</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap">
@@ -11,7 +12,7 @@
   --hair:rgba(23,21,14,.09); --hair-soft:rgba(23,21,14,.055);
   --moss:#43613C; --kombu:#2A4A2E; --arti:#7A9169; --lime:#AFC244;
   --rust:#A15C3E; --amber:#9A6C08;
-  --sans:"Be Vietnam Pro",-apple-system,BlinkMacSystemFont,"PingFang SC","PingFang HK","Noto Sans SC","Microsoft YaHei",sans-serif;
+  --sans:"Be Vietnam Pro","PingFang SC","Microsoft YaHei","Noto Sans CJK SC","Noto Sans SC",sans-serif;
   --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   --spring:cubic-bezier(.34,1.42,.64,1);
   --glide:cubic-bezier(.32,.72,0,1);
@@ -219,6 +220,46 @@ strong{font-weight:750;color:var(--ink)}
   color:var(--kombu);text-wrap:balance;
 }
 
+/* ---------- 原估对现估 ---------- */
+.cmp-rows .row.cmp{
+  grid-template-columns:minmax(96px,132px) 74px 74px 1.5fr;
+  gap:14px;align-items:baseline;padding:12px 4px;
+}
+@media(max-width:860px){.cmp-rows .row.cmp{grid-template-columns:1fr 74px 74px;gap:8px}
+  .cmp-rows .row.cmp .v{grid-column:1/-1}}
+.row.cmp .was{font-size:14px;color:var(--ink-faint);text-decoration:line-through}
+.row.cmp .now{font-size:16px;font-weight:700;color:var(--moss)}
+.row.cmp.keep .now{color:var(--rust)}
+.row.cmp.keep .was{text-decoration:none}
+.row.cmp .v{font-size:13.5px}
+
+.total{
+  display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;margin-top:26px;
+  padding-top:20px;border-top:1px solid var(--hair);
+}
+.total .tl{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint)}
+.total b{font-weight:700;letter-spacing:-.04em;line-height:1}
+.total .was-big{font-size:clamp(26px,3.2vw,38px);color:var(--ink-faint);text-decoration:line-through}
+.total .now-big{font-size:clamp(40px,5.6vw,68px);color:var(--moss)}
+.total .tu{font-size:14px;color:var(--ink-mute)}
+.total .arrow{color:var(--ink-faint);font-size:17px;margin:0 6px}
+.total .rng{font-size:13px;color:var(--ink-mute);margin-left:auto;padding-left:16px}
+@media(max-width:720px){.total .rng{margin-left:0;width:100%}}
+
+.pt{font-size:17.5px;font-weight:750;letter-spacing:-.018em;margin-top:11px}
+
+/* ---------- 前提 ---------- */
+.pre{
+  margin-top:24px;padding:18px 22px;border-radius:14px;
+  background:var(--surface-2);border:1px solid var(--hair);
+}
+.pre-t{
+  font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--moss);margin-bottom:11px;
+}
+.pre-l{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:var(--ink-2);padding:4px 0;line-height:1.6}
+.pre-l .dot{margin-top:8px}
+
 /* ---------- 导航 ---------- */
 .hud{
   position:fixed;left:0;right:0;bottom:0;z-index:20;
@@ -261,6 +302,33 @@ svg{max-width:100%;height:auto;display:block}
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.001ms !important;transition-duration:.001ms !important}
 }
+
+/* ---------- 打印：一页一张，动画一律落到终态 ----------
+   幻灯片平时是叠在一起、靠 .on 显示的。打印时要全部摊开、
+   每张各占一页，而且所有靠 .on 才生效的终态都要补上，
+   否则条形是空的、时间轴的线没长出来。 */
+@page{size:1440px 810px;margin:0}
+@media print{
+  html,body{height:auto;overflow:visible;background:#EAE8E0}
+  body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .bg{position:absolute;height:100%}
+  .deck{height:auto}
+  .slide{
+    position:relative;inset:auto;
+    width:1440px;height:810px;
+    opacity:1 !important;visibility:visible !important;
+    overflow:hidden;break-after:page;page-break-after:always;
+  }
+  .slide:last-child{break-after:auto;page-break-after:auto}
+  .slide .fx{animation:none !important;opacity:1 !important;transform:none !important}
+  .bar-fill{width:var(--w) !important;min-width:14px !important;transition:none !important}
+  .bar-val{opacity:1 !important;transition:none !important}
+  .rail-fill{width:100% !important;transition:none !important}
+  .dots span{animation:none !important;opacity:.34 !important;transform:none !important}
+  .dots.one span{opacity:1 !important}
+  .node::before{animation:none !important;opacity:1 !important;transform:none !important}
+  .hud,.hint{display:none !important}
+}
 </style>
 
 <div class="bg">
@@ -278,11 +346,11 @@ svg{max-width:100%;height:auto;display:block}
 <section class="slide">
   <div class="wrap">
     <div class="eyebrow fx" style="--d:0ms">SEDNA CARE 院舍照护管理</div>
-    <h1 class="fx" style="--d:60ms">两天，和二十五周</h1>
+    <h1 class="fx" style="--d:60ms">两天，和十九周</h1>
     <div class="cover-nums fx" style="--d:180ms">
       <div><b class="a num">2</b> <i>天</i><div class="hero-cap">做一个能跑的系统</div></div>
       <div class="vs">→</div>
-      <div><b class="b num">25</b> <i>周</i><div class="hero-cap">做一个能扛的系统</div></div>
+      <div><b class="b num">19</b> <i>周</i><div class="hero-cap">做一个能扛的系统</div></div>
     </div>
     <p class="lead fx" style="--d:300ms">这两个数字都是真的。它们不矛盾。<br>下面用这个项目上真实发生的四件事，说明中间隔着什么。</p>
   </div>
@@ -482,10 +550,10 @@ svg{max-width:100%;height:auto;display:block}
         <div class="bar"></div>
         <h3>能扛</h3>
         <p class="who">三间院舍，几十人同时用，社署随时来查，有人离职要交接，资料保存七年。</p>
-        <div class="cost">约 25 周</div>
+        <div class="cost">约 19 周</div>
       </div>
     </div>
-    <p class="kicker fx" style="--d:560ms">那二十五周不在「能跑」里面，全部花在从能跑走到能扛的这段路上。</p>
+    <p class="kicker fx" style="--d:560ms">那十九周不在「能跑」里面，全部花在从能跑走到能扛的这段路上。</p>
   </div>
 </section>
 
@@ -504,20 +572,56 @@ svg{max-width:100%;height:auto;display:block}
   </div>
 </section>
 
-<!-- 10 25周在做什么 -->
+<!-- 10 从 25 压到 19 -->
 <section class="slide">
   <div class="wrap">
-    <div class="eyebrow fx" style="--d:0ms">这二十五周在做什么</div>
-    <h2 class="fx" style="--d:60ms">用「不做会怎样」来看</h2>
-    <div class="rows fx" style="--d:200ms;margin-top:22px">
-      <div class="row"><div class="k">基础 <span class="wk">4 周</span></div><div class="v">不做，谁都能看到谁的资料</div></div>
-      <div class="row"><div class="k">每日流程 <span class="wk">5–6 周</span></div><div class="v">不做，系统没人用，因为它不跟着实际工作走</div></div>
-      <div class="row"><div class="k">合规与分析 <span class="wk">3–4 周</span></div><div class="v">不做，社署来查，答不出这条记录谁改的</div></div>
-      <div class="row"><div class="k">排班引擎 <span class="wk">5–7 周</span></div><div class="v">不做，排班还是在 Excel 里做</div></div>
-      <div class="row"><div class="k">AI 功能 <span class="wk">3–5 周</span></div><div class="v">看要做哪些，另外谈</div></div>
-      <div class="row hot"><div class="k"><span class="dot bad"></span>加固 <span class="wk">3–4 周</span></div><div class="v">不做，上面五项全部做完，然后数据长起来之后开始出事</div></div>
+    <div class="eyebrow fx" style="--d:0ms">重新估算</div>
+    <h2 class="fx" style="--d:60ms">从二十五周压到十九周，压掉的是什么</h2>
+    <p class="sub fx" style="--d:120ms">原来那份计划是从零开始算的。演示做完之后有几段已经跑通了，所以能往下压。</p>
+    <div class="rows cmp-rows fx" style="--d:200ms;margin-top:18px">
+      <div class="row cmp"><div class="k">基础</div><div class="was num">4 周</div><div class="now num">2 周</div><div class="v">登录、三角色、院舍隔离、住客主档、Excel 导入，演示里已经跑通。剩下的是把演示级做成生产级</div></div>
+      <div class="row cmp"><div class="k">每日流程</div><div class="was num">5–6 周</div><div class="now num">5 周</div><div class="v">创建计划、开工接更、收工交更、表单审批。这块演示几乎没做，压不动</div></div>
+      <div class="row cmp"><div class="k">合规与留痕</div><div class="was num">3–4 周</div><div class="now num">2.5 周</div><div class="v">留痕、评估到期追踪、合规看板已有雏形</div></div>
+      <div class="row cmp"><div class="k">排班</div><div class="was num">5–7 周</div><div class="now num">4 周</div><div class="v">第一版只做辅助排班与冲突检测，自动优化排到之后</div></div>
+      <div class="row cmp"><div class="k">AI 与知识库</div><div class="was num">3–5 周</div><div class="now num">2.5 周</div><div class="v">规范问答已跑通，每句带原文出处</div></div>
+      <div class="row cmp keep"><div class="k"><span class="dot bad"></span>加固</div><div class="was num">3–4 周</div><div class="now num">3.5 周</div><div class="v"><strong>一周没减。</strong>这一段减了，上面五段全部作废</div></div>
     </div>
-    <p class="kicker fx" style="--d:420ms">最后一行最容易被砍掉。砍掉之后，前面五行全部作废。</p>
+    <div class="total fx" style="--d:420ms">
+      <span class="tl">原估</span><b class="num was-big">25</b><span class="tu">周</span>
+      <span class="arrow">→</span>
+      <span class="tl">现估</span><b class="num now-big">19</b><span class="tu">周</span>
+      <span class="rng">区间 17 到 22，随下一页那三件事的确认时间浮动</span>
+    </div>
+  </div>
+</section>
+
+<!-- 11 十九周不包括什么 -->
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow fx" style="--d:0ms">先说清楚，免得后面误会</div>
+    <h2 class="fx" style="--d:60ms">这十九周里，不包括这四件事</h2>
+    <p class="sub fx" style="--d:120ms">压缩靠的是缩范围，不是靠赶工。缩掉的部分现在讲明白，比上线前才发现好。</p>
+    <div class="grid g2 fx" style="--d:220ms;margin-top:24px">
+      <div class="panel"><div class="tag"><span class="dot warn"></span>另算</div>
+        <h3 class="pt">另外两间院舍上线</h3>
+        <p class="hero-cap">十九周做到一间院舍正式上生产。系统本身支持多院舍，另外两间是数据迁移加培训，每间约两周</p></div>
+      <div class="panel"><div class="tag"><span class="dot warn"></span>第二版</div>
+        <h3 class="pt">排班的自动优化</h3>
+        <p class="hero-cap">第一版是人来排、系统来挡错。全自动优化要等排班规则访谈完成之后再估</p></div>
+      <div class="panel"><div class="tag"><span class="dot warn"></span>第二版</div>
+        <h3 class="pt">另外三个 AI 方向</h3>
+        <p class="hero-cap">管理层问数、交更摘要、复康月度报告不在内。后两个还需要三到六个月的历史数据才有内容可写</p></div>
+      <div class="panel"><div class="tag"><span class="dot bad"></span>要先盘点</div>
+        <h3 class="pt">与现有系统的数据迁移</h3>
+        <p class="hero-cap">纸本要不要补录、补录到哪一年，是业务决策。没盘点之前给不出数字，硬给就是骗人</p></div>
+    </div>
+    <div class="pre fx" style="--d:400ms">
+      <div class="pre-t">三个前提</div>
+      <div class="pre-l"><span class="dot"></span>一位开发全职投入，按工作日计，不含节假日与贵司内部审批的等待时间</div>
+      <div class="pre-l"><span class="dot warn"></span>排班规则访谈在第六周前完成。晚一周，排班那一段整体后移一周</div>
+      <div class="pre-l"><span class="dot bad"></span>跨境资料合规在第四周前确认。晚了要改架构，等于推倒重来</div>
+    </div>
+    <p class="kicker fx" style="--d:520ms">这是估算区间，不是承诺日期。上面三件事确认之后，区间会收窄很多。</p>
   </div>
 </section>
 
@@ -525,21 +629,21 @@ svg{max-width:100%;height:auto;display:block}
 <section class="slide">
   <div class="wrap">
     <div class="eyebrow fx" style="--d:0ms">交付节奏</div>
-    <h2 class="fx" style="--d:60ms">不是二十五周之后才交货</h2>
+    <h2 class="fx" style="--d:60ms">不是十九周之后才交货</h2>
     <p class="sub fx" style="--d:120ms">每四到六周交一次，每一次交的都是您可以自己打开来点的东西。</p>
     <div class="rail fx" style="--d:240ms">
       <div class="rail-fill"></div>
       <div class="nodes">
-        <div class="node" style="--i:0"><div class="wk">第 4 周</div><div class="t">能登入</div><div class="d">三种角色，住客名单进系统</div></div>
-        <div class="node" style="--i:1"><div class="wk">第 10 周</div><div class="t">一间院舍试用</div><div class="d">每日流程跑通，前线开始真的用</div></div>
-        <div class="node" style="--i:2"><div class="wk">第 14 周</div><div class="t">合规能交差</div><div class="d">留痕与合规看板，可以拿去应付稽查</div></div>
-        <div class="node" style="--i:3"><div class="wk">第 21 周</div><div class="t">排班搬进来</div><div class="d">从 Excel 搬进系统</div></div>
-        <div class="node" style="--i:4"><div class="wk">第 25 周</div><div class="t">三间全上</div><div class="d">全部院舍上线</div></div>
+        <div class="node" style="--i:0"><div class="wk">第 2 周</div><div class="t">能登入</div><div class="d">三种角色，住客名单进系统</div></div>
+        <div class="node" style="--i:1"><div class="wk">第 7 周</div><div class="t">一间院舍试用</div><div class="d">每日流程跑通，前线开始真的用</div></div>
+        <div class="node" style="--i:2"><div class="wk">第 12 周</div><div class="t">合规能交差</div><div class="d">留痕、合规看板、规范问答</div></div>
+        <div class="node" style="--i:3"><div class="wk">第 16 周</div><div class="t">排班第一版</div><div class="d">辅助排班与冲突检测</div></div>
+        <div class="node" style="--i:4"><div class="wk">第 19 周</div><div class="t">正式上线</div><div class="d">加固完成，一间院舍上生产</div></div>
       </div>
     </div>
     <div class="quote fx" style="--d:520ms;margin-top:38px">
       每一个节点您都可以喊停。<br>
-      二十五周听起来是押二十五周的注，五个节点是押四周的注，看到结果满意了再押下一注。
+      十九周听起来是押十九周的注，五个节点是押四周的注，看到结果满意了再押下一注。
     </div>
   </div>
 </section>
@@ -575,7 +679,7 @@ svg{max-width:100%;height:auto;display:block}
 
 <div class="hud">
   <div class="pips" id="pips"></div>
-  <div class="count" id="count">01 / 12</div>
+  <div class="count" id="count">01 / 13</div>
   <div class="arrows">
     <button id="prev" aria-label="上一页">←</button>
     <button id="next" aria-label="下一页">→</button>
